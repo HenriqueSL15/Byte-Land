@@ -17,3 +17,19 @@
     }
   }
 }
+
+/* Animação de fade */
+.icon-fade-enter {
+  opacity: 0;
+}
+.icon-fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in-out;
+}
+.icon-fade-exit {
+  opacity: 1;
+}
+.icon-fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-in-out;
+}
