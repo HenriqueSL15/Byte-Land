@@ -1,23 +1,19 @@
 import { useState } from "react";
-import LeftPart from "./components/LeftPart.jsx";
-import MiddlePart from "./components/MiddlePart.jsx";
-import RightPart from "./components/RightPart.jsx";
+import HomePage from "./components/HomePage.jsx";
+import Login from "./components/Login.jsx";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+
 import "./App.css";
 
 function App() {
   return (
     <>
-      <div className="flex">
-        <div className="w-3/12 h-screen">
-          <LeftPart></LeftPart>
-        </div>
-        <div className="w-6/12 h-screen">
-          <MiddlePart></MiddlePart>
-        </div>
-        <div className="w-3/12 h-screen">
-          <RightPart></RightPart>
-        </div>
-      </div>
+      <Router>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/login" element={<Login />} />
+        </Routes>
+      </Router>
     </>
   );
 }
