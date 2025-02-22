@@ -1,12 +1,21 @@
 // Biblioteca para validar emails
 import validator from "validator";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import { AuthContext } from "./AuthContext.jsx";
 import axios from "axios";
 
 import { LuEye } from "react-icons/lu";
 import { LuEyeClosed } from "react-icons/lu";
 
-function SignUp() {
+function Login() {
+  // Navegação
+  const navigate = useNavigate();
+
+  //Contexto de login
+  const { login } = useContext(AuthContext);
+
   // Email e verificação de email
   const [email, setEmail] = useState("");
   const isEmailValid = email === "" ? null : validator.isEmail(email);
@@ -45,7 +54,9 @@ function SignUp() {
 
       console.log("Valor da response:", response.data);
       if (response.status == 200) {
+        login(response.data.user);
         console.log("Login realizado com sucesso!");
+        navigate("/");
       }
     } catch (error) {
       console.log(error);
@@ -122,7 +133,7 @@ function SignUp() {
           </div>
 
           {/* Botão de Continuar */}
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center flex-col gap-3">
             <button
               type="button"
               // Verificação para alterar os estilos com base no preenchimento de todas as informações do formulário
@@ -133,8 +144,22 @@ function SignUp() {
               } hover:scale-105 transition-all`}
               onClick={handleLoginSubmit}
             >
-              Continue
+              Continuar
             </button>
+            <div className="flex flex-row gap-2">
+              <Link
+                to="/signup"
+                className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
+              >
+                Você não possui uma conta?
+              </Link>
+              <Link
+                to="/"
+                className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
+              >
+                Quer voltar a tela principal?
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -142,4 +167,4 @@ function SignUp() {
   );
 }
 
-export default SignUp;
+export default Login;

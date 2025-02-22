@@ -1,11 +1,15 @@
 import { CiImageOn } from "react-icons/ci";
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
+
+import { AuthContext } from "./AuthContext.jsx";
 
 function NewPublicationBox() {
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+
+  const { user } = useContext(AuthContext);
 
   const handleImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -22,7 +26,7 @@ function NewPublicationBox() {
     }
 
     const formData = new FormData();
-    formData.append("owner_id", 123456);
+    formData.append("owner", user.name);
     formData.append("title", title);
     formData.append("description", description);
     if (image) {
@@ -56,13 +60,17 @@ function NewPublicationBox() {
       <div className="w-9/10 shadow-lg rounded-lg my-5">
         <div className="m-5 mb-5 flex items-center gap-2">
           <img
-            src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
+            src={
+              user
+                ? user.image
+                : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+            }
             alt="Foto da pessoa"
             className="w-12 h-12 rounded-full"
           />
           <div className="flex flex-col">
             <h1 className="text-2xl font-poppins font-medium">
-              Nome da Pessoa
+              {user ? user.name : "Nome da Pessoa"}
             </h1>
           </div>
         </div>
@@ -111,7 +119,7 @@ function NewPublicationBox() {
                 className="text-black h-1/2 font-bold border-2 w-1/4 py-2 px-4 rounded-full cursor-pointer"
                 onClick={() => setImage(null)}
               >
-                Apagar Imagem
+                Delete Image
               </button>
             )}
           </div>

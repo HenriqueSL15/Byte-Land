@@ -5,24 +5,24 @@ function RightPart() {
     {
       img: "https://cdn-icons-png.flaticon.com/512/711/711769.png",
       name: "Cleiton",
-      job: "Photographer",
+      job: "Fotógrafo",
     },
     {
       img: "https://cdn-icons-png.flaticon.com/512/711/711769.png",
       name: "João",
-      job: "Travel Blogger",
+      job: "Blogger de Viagens",
     },
     {
       img: "https://cdn-icons-png.flaticon.com/512/711/711769.png",
       name: "Carla",
-      job: "Interest Group",
+      job: "Grupo de Interesse",
     },
   ];
 
   return (
     <div className="flex flex-col p-10">
       <h1 className="text-3xl text-center font-funnel-sans font-semibold mb-10">
-        Suggested Profiles
+        Perfis Sugeridos
       </h1>
       <div className="flex flex-col ml-7">
         {example.map((element, index) => {

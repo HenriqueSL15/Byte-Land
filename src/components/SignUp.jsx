@@ -1,12 +1,18 @@
 // Biblioteca para validar emails
 import validator from "validator";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { AuthContext } from "./AuthContext.jsx";
 import axios from "axios";
 
 import { LuEye } from "react-icons/lu";
 import { LuEyeClosed } from "react-icons/lu";
 
 function SignUp() {
+  const navigate = useNavigate();
+  // Contexto de autenticação
+  const { login } = useContext(AuthContext);
+
   // Usuário
   const [user, setUser] = useState("");
 
@@ -65,8 +71,10 @@ function SignUp() {
         }
       );
 
-      console.log("Valor da response:", response.data);
+      console.log("Valor da response:", response.data.user);
       if (response.status == 200) {
+        login(response.data.user);
+        navigate("/");
         console.log("Sign Up realizado com sucesso!");
       }
     } catch (error) {
@@ -211,7 +219,7 @@ function SignUp() {
           </div>
 
           {/* Botão de Continuar */}
-          <div className="flex items-center justify-center">
+          <div className="flex flex-col gap-3 items-center justify-center">
             <button
               type="button"
               // Verificação para alterar os estilos com base no preenchimento de todas as informações do formulário
@@ -222,8 +230,22 @@ function SignUp() {
               } hover:scale-105 transition-all`}
               onClick={handleSignUpSubmit}
             >
-              Continue
+              Continuar
             </button>
+            <div className="flex flex-row gap-2">
+              <Link
+                to="/login"
+                className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
+              >
+                Você possui uma conta?
+              </Link>
+              <Link
+                to="/"
+                className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
+              >
+                Quer voltar a tela principal?
+              </Link>
+            </div>
           </div>
         </div>
       </div>

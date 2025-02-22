@@ -5,6 +5,10 @@ import { FaUserFriends } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 import { Link } from "react-router-dom";
 
+import { useContext } from "react";
+
+import { AuthContext } from "./AuthContext.jsx";
+
 function LeftPart() {
   const buttons = [
     {
@@ -14,27 +18,32 @@ function LeftPart() {
     },
     {
       id: 2,
-      text: "Notifications",
+      text: "Notificações",
       icon: <IoIosNotifications className="w-7 h-7" />,
     },
     {
       id: 3,
-      text: "Messages",
+      text: "Mensagens",
       icon: <LuMessageSquareText className="w-7 h-7" />,
     },
     {
       id: 4,
-      text: "Friends",
+      text: "Amigos",
       icon: <FaUserFriends className="w-7 h-7" />,
     },
     {
       id: 5,
-      text: "Settings",
+      text: "Configurações",
       icon: <IoMdSettings className="w-7 h-7" />,
     },
   ];
 
-  const login = [];
+  const { user, logout } = useContext(AuthContext);
+  console.log(user);
+
+  function handleLogout() {
+    logout();
+  }
 
   return (
     <div className="flex flex-col p-10 h-screen text-center">
@@ -45,13 +54,27 @@ function LeftPart() {
         </div>
       ))}
       <div className="flex flex-col mt-auto">
-        <div className="flex gap-4 p-2 cursor-pointer my-3">
-          {login[0] ? (
-            <img
-              src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
-              alt="Foto da pessoa"
-              className="w-12 h-12 rounded-full"
-            />
+        <div className="flex gap-4 p-2 my-3">
+          {user ? (
+            <div className="flex-col text-center">
+              <div className="flex flex-row gap-3 mb-5">
+                <img
+                  src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                  alt="Foto da pessoa"
+                  className="w-12 h-12 rounded-full"
+                />
+                <h1 className="text-2xl pt-3 cursor-pointer font-montserrat font-medium text-gray-600 border-b-2 border-gray-400 mt-auto mb-2 hover:border-gray-600 hover:text-gray-900 transition-all">
+                  {user.name}
+                </h1>
+              </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="border-2 px-5 py-3 font-montserrat font-bold rounded-lg cursor-pointer hover:bg-gray-200 text-xl"
+              >
+                Deslogar
+              </button>
+            </div>
           ) : (
             <Link
               to="/login"
