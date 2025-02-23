@@ -6,7 +6,8 @@ import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
 
 function NewPublicationBox() {
-  const { show } = usePopUp();
+  //Contexto de pop-up
+  const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
 
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
@@ -24,7 +25,8 @@ function NewPublicationBox() {
 
   const handleSubmitPublication = async () => {
     if (!title || !description) {
-      alert("Por favor, preencha o título e a descrição.");
+      setPopUpMessage("Preencha todos os campos!");
+      showPopUp();
       return;
     }
 
@@ -137,6 +139,25 @@ function NewPublicationBox() {
           </button>
         </div>
       </div>
+      {show && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-900/50">
+          <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130 ">
+            <p className="text-red-500 text-center font-poppins text-sm font-semibold">
+              {message}
+            </p>
+            <button
+              type="button"
+              className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
+              onClick={() => {
+                setPopUpMessage("");
+                closePopUp();
+              }}
+            >
+              Tentar novamente
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

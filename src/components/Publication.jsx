@@ -79,34 +79,36 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
         )}
       </div>
       {/* Pop Up */}
-      {show && (
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900/50 ">
-          <div className="bg-white border-2 p-10 rounded-lg">
-            <p className="text-red-500 text-center font-poppins text-xl font-semibold">
-              {message}
-            </p>
-            <div className="flex justify-center gap-2 scale-130 mt-10">
-              <button
-                type="button"
-                className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
-                onClick={() => closePopUp()}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                className="border-b-2  font-poppins text-sm hover:bg-red-200 px-5 pt-1 rounded-lg transition-all"
-                onClick={() => {
-                  handleDeletePublication();
-                  closePopUp();
-                }}
-              >
-                Confirmar
-              </button>
+      {show &&
+        message ==
+          "Tem certeza que você deseja deletar essa publicação? Essa ação não tem retorno." && (
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-900/50">
+            <div className="bg-white border-2 p-10 rounded-lg">
+              <p className="text-red-500 text-center font-poppins text-xl font-semibold">
+                {message}
+              </p>
+              <div className="flex justify-center gap-2 scale-130 mt-10">
+                <button
+                  type="button"
+                  className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
+                  onClick={() => closePopUp()}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="border-b-2  font-poppins text-sm hover:bg-red-200 px-5 pt-1 rounded-lg transition-all"
+                  onClick={() => {
+                    handleDeletePublication();
+                    closePopUp();
+                  }}
+                >
+                  Confirmar
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
     </div>
   );
 }

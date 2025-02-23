@@ -3,7 +3,10 @@ import validator from "validator";
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+
 import { AuthContext } from "./AuthContext.jsx";
+import { usePopUp } from "./PopUpContext.jsx";
+
 import axios from "axios";
 
 import { LuEye } from "react-icons/lu";
@@ -12,6 +15,9 @@ import { LuEyeClosed } from "react-icons/lu";
 function Login() {
   // Navegação
   const navigate = useNavigate();
+
+  // Contexto de pop-up
+  const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
 
   //Contexto de login
   const { login } = useContext(AuthContext);
@@ -38,7 +44,6 @@ function Login() {
   async function handleLoginSubmit() {
     console.log("Enviando dados...");
     try {
-      console.log("Criando promise");
       const response = await axios.post(
         "http://localhost:3000/login",
         {
@@ -52,7 +57,6 @@ function Login() {
         }
       );
 
-      console.log("Valor da response:", response.data);
       if (response.status == 200) {
         login(response.data.user);
         console.log("Login realizado com sucesso!");
@@ -60,6 +64,13 @@ function Login() {
       }
     } catch (error) {
       console.log(error);
+      if (
+        error.response.data.message == "O email ou a senha estão incorretos!"
+      ) {
+        console.log("Deu errado");
+        setPopUpMessage(error.response.data.message);
+        showPopUp();
+      }
     }
     console.log(`Email: ${email}\nSenha: ${password}`);
   }
@@ -142,7 +153,17 @@ function Login() {
                   ? "border-2 border-green-500  cursor-pointer"
                   : "border-2 border-red-500  cursor-not-allowed"
               } hover:scale-105 transition-all`}
-              onClick={handleLoginSubmit}
+              onClick={() => {
+                if (isEmailValid && password != "") {
+                  handleLoginSubmit();
+                } else if (email == "" || password == "") {
+                  setPopUpMessage("Preencha todos os campos!");
+                  showPopUp(true);
+                } else if (!isEmailValid && email != "") {
+                  setPopUpMessage("Email inválido!");
+                  showPopUp(true);
+                }
+              }}
             >
               Continuar
             </button>
@@ -163,6 +184,26 @@ function Login() {
           </div>
         </div>
       </div>
+      {/* Pop-up*/}
+      {show && (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50">
+          <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130 ">
+            <p className="text-red-500 text-center font-poppins text-sm font-semibold">
+              {message}
+            </p>
+            <button
+              type="button"
+              className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
+              onClick={() => {
+                setPopUpMessage("");
+                closePopUp();
+              }}
+            >
+              Tentar novamente
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

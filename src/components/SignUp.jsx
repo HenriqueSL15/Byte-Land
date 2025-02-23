@@ -3,6 +3,7 @@ import validator from "validator";
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext.jsx";
+import { usePopUp } from "./PopUpContext.jsx";
 import axios from "axios";
 
 import { LuEye } from "react-icons/lu";
@@ -10,6 +11,8 @@ import { LuEyeClosed } from "react-icons/lu";
 
 function SignUp() {
   const navigate = useNavigate();
+  // Contexto de pop-up
+  const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
 
   //Verificação se existe conflito de email ou usuário
   const [conflict, setConflict] = useState(null);
@@ -80,7 +83,8 @@ function SignUp() {
         navigate("/");
         console.log("Sign Up realizado com sucesso!");
       } else if (response.status == 200) {
-        setConflict(response.data.message);
+        setPopUpMessage(response.data.message);
+        showPopUp();
       }
     } catch (error) {
       console.log(error);
@@ -91,9 +95,7 @@ function SignUp() {
   return (
     <div className="w-full h-screen flex justify-center items-center">
       <div
-        className={`flex flex-col w-4/10 min-h-4/6 shadow-lg text-center overflow-y-auto ${
-          conflict ? "blur-sm" : ""
-        } transition-all `}
+        className={`flex flex-col w-4/10 min-h-4/6 shadow-lg text-center overflow-y-auto transition-all `}
       >
         <h1 className="text-3xl p-3 font-montserrat font-semibold">Sign Up</h1>
         <div className="flex flex-col p-5 gap-7">
@@ -237,7 +239,28 @@ function SignUp() {
                   ? "border-2 border-green-500  cursor-pointer"
                   : "border-2 border-red-500  cursor-not-allowed"
               } hover:scale-105 transition-all`}
-              onClick={handleSignUpSubmit}
+              onClick={() => {
+                if (isEmailValid && isPasswordValid && user != "") {
+                  handleSignUpSubmit();
+                } else if (
+                  user == "" ||
+                  email == "" ||
+                  password1 == "" ||
+                  password2 == ""
+                ) {
+                  setPopUpMessage("Preencha todos os campos!");
+                  showPopUp(true);
+                } else if (!isEmailValid && isPasswordValid) {
+                  setPopUpMessage("Email inválido!");
+                  showPopUp(true);
+                } else if (isEmailValid && !isPasswordValid) {
+                  setPopUpMessage("Senha inválida!");
+                  showPopUp(true);
+                } else if (!isEmailValid && !isPasswordValid) {
+                  setPopUpMessage("Email e senha inválidos!");
+                  showPopUp(true);
+                }
+              }}
             >
               Continuar
             </button>
@@ -258,28 +281,34 @@ function SignUp() {
           </div>
         </div>
       </div>
-      {conflict && (
-        <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130">
-          <p className="text-red-500 text-center font-poppins text-sm font-semibold">
-            {conflict}
-          </p>
-          <button
-            type="button"
-            className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
-            onClick={() => {
-              if (conflict == "Esse nome de usuário já está em uso.") {
-                setUser("");
-              } else if (conflict == "Esse e-mail já está em uso.") {
-                setEmail("");
-              } else {
-                setUser("");
-                setEmail("");
-              }
-              setConflict(null);
-            }}
-          >
-            Tentar novamente
-          </button>
+      {show && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-900/50">
+          <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130 ">
+            <p className="text-red-500 text-center font-poppins text-sm font-semibold">
+              {message}
+            </p>
+            <button
+              type="button"
+              className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
+              onClick={() => {
+                if (message == "Esse nome de usuário já está em uso.") {
+                  setUser("");
+                } else if (message == "Esse e-mail já está em uso.") {
+                  setEmail("");
+                } else if (
+                  message == "Este nome de usuário e e-mail já estão em uso."
+                ) {
+                  setUser("");
+                  setEmail("");
+                }
+
+                setPopUpMessage("");
+                closePopUp();
+              }}
+            >
+              Tentar novamente
+            </button>
+          </div>
         </div>
       )}
     </div>
