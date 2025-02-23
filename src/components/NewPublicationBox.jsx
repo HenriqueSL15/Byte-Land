@@ -3,8 +3,11 @@ import React, { useState, useContext } from "react";
 import axios from "axios";
 
 import { AuthContext } from "./AuthContext.jsx";
+import { usePopUp } from "./PopUpContext.jsx";
 
 function NewPublicationBox() {
+  const { show } = usePopUp();
+
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -56,7 +59,7 @@ function NewPublicationBox() {
   };
 
   return (
-    <div className="flex items-center justify-center mb-10">
+    <div className={`flex items-center justify-center mb-10 `}>
       <div className="w-9/10 shadow-lg rounded-lg my-5">
         <div className="m-5 mb-5 flex items-center gap-2">
           <img

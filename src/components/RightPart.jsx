@@ -1,6 +1,8 @@
 import Profile from "./Profile.jsx";
+import { usePopUp } from "./PopUpContext.jsx";
 
 function RightPart() {
+  const { show } = usePopUp();
   const example = [
     {
       img: "https://cdn-icons-png.flaticon.com/512/711/711769.png",
@@ -20,7 +22,7 @@ function RightPart() {
   ];
 
   return (
-    <div className="flex flex-col p-10">
+    <div className={`flex flex-col p-10 `}>
       <h1 className="text-3xl text-center font-funnel-sans font-semibold mb-10">
         Perfis Sugeridos
       </h1>

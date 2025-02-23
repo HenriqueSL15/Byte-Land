@@ -10,6 +10,10 @@ import { LuEyeClosed } from "react-icons/lu";
 
 function SignUp() {
   const navigate = useNavigate();
+
+  //Verificação se existe conflito de email ou usuário
+  const [conflict, setConflict] = useState(null);
+
   // Contexto de autenticação
   const { login } = useContext(AuthContext);
 
@@ -33,8 +37,6 @@ function SignUp() {
   const [showPassword1, setShowPassword1] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
 
-  const hasAllInformation = user !== "" && isEmailValid && isPasswordValid;
-
   // Alteração do Usuário
   function handleUserChange(event) {
     setUser(event.value);
@@ -54,9 +56,7 @@ function SignUp() {
 
   //Envio do formulário de Login
   async function handleSignUpSubmit() {
-    console.log("Enviando dados...");
     try {
-      console.log("Criando promise");
       const response = await axios.post(
         "http://localhost:3000/signup",
         {
@@ -71,11 +71,16 @@ function SignUp() {
         }
       );
 
-      console.log("Valor da response:", response.data.user);
-      if (response.status == 200) {
+      console.log("Valor da response:", response.data.message);
+      if (
+        response.status == 200 &&
+        response.data.message == "Usuário criado com sucesso!"
+      ) {
         login(response.data.user);
         navigate("/");
         console.log("Sign Up realizado com sucesso!");
+      } else if (response.status == 200) {
+        setConflict(response.data.message);
       }
     } catch (error) {
       console.log(error);
@@ -85,7 +90,11 @@ function SignUp() {
 
   return (
     <div className="w-full h-screen flex justify-center items-center">
-      <div className="flex flex-col w-4/10 min-h-4/6 shadow-lg text-center overflow-y-auto">
+      <div
+        className={`flex flex-col w-4/10 min-h-4/6 shadow-lg text-center overflow-y-auto ${
+          conflict ? "blur-sm" : ""
+        } transition-all `}
+      >
         <h1 className="text-3xl p-3 font-montserrat font-semibold">Sign Up</h1>
         <div className="flex flex-col p-5 gap-7">
           {/* Label e Input do usuário */}
@@ -249,6 +258,30 @@ function SignUp() {
           </div>
         </div>
       </div>
+      {conflict && (
+        <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130">
+          <p className="text-red-500 text-center font-poppins text-sm font-semibold">
+            {conflict}
+          </p>
+          <button
+            type="button"
+            className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
+            onClick={() => {
+              if (conflict == "Esse nome de usuário já está em uso.") {
+                setUser("");
+              } else if (conflict == "Esse e-mail já está em uso.") {
+                setEmail("");
+              } else {
+                setUser("");
+                setEmail("");
+              }
+              setConflict(null);
+            }}
+          >
+            Tentar novamente
+          </button>
+        </div>
+      )}
     </div>
   );
 }

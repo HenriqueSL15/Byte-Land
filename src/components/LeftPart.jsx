@@ -8,8 +8,12 @@ import { Link } from "react-router-dom";
 import { useContext } from "react";
 
 import { AuthContext } from "./AuthContext.jsx";
+import { usePopUp } from "./PopUpContext.jsx";
 
 function LeftPart() {
+  //Contexto do pop up
+  const { show } = usePopUp();
+
   const buttons = [
     {
       id: 1,
@@ -39,14 +43,13 @@ function LeftPart() {
   ];
 
   const { user, logout } = useContext(AuthContext);
-  console.log(user);
 
   function handleLogout() {
     logout();
   }
 
   return (
-    <div className="flex flex-col p-10 h-screen text-center">
+    <div className={`flex flex-col p-10 h-screen text-center`}>
       {buttons.map((button) => (
         <div key={button.id} className="flex gap-4 p-2 cursor-pointer my-3">
           {button.icon}
