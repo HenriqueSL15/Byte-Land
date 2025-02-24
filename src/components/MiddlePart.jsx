@@ -38,7 +38,7 @@ function MiddlePart() {
               <Publication
                 id={element._id}
                 isOwner={user ? user.name === element.owner : false}
-                key={index}
+                key={element._id}
                 owner={element.owner}
                 title={element.title}
                 description={element.description}
