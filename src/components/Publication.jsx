@@ -5,16 +5,22 @@ import { IoCloseOutline } from "react-icons/io5";
 import { IoSend } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
 import { useContext, useEffect, useState, useCallback } from "react";
+
 import { usePopUp } from "./PopUpContext.jsx";
 import axios from "axios";
 
 function Publication({ id, isOwner, owner, date, title, description, image }) {
-  // console.log(id);
   //Contexto do usuário
   const { user } = useContext(AuthContext);
 
   //Estado para mostrar ou não o botão de deletar publicação
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
+
+  //Estado para armazenar os comentários
+  const [comments, setComments] = useState([]);
+
+  //Estado para armazenar novos comentários
+  const [newComment, setNewComment] = useState("");
 
   //Estaod sobre as edições feitas
   const [editedTitle, setEditedTitle] = useState(null);
@@ -35,7 +41,6 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
 
   //Função para deletar a publicação
   const handleDeletePublication = async (id, owner) => {
-    console.log("ID dentro da função:", id); // Verifique o ID no console
     const publicationData = {
       id: id,
       owner: owner,
@@ -87,10 +92,87 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     }
   }
 
+  //Função para obter todos os comentários da publicação
+  async function getAllComments(id) {
+    try {
+      const response = await axios.post("http://localhost:3000/getComments", {
+        data: { id: id },
+      });
+
+      if (response.status == 200) {
+        setComments(response.data.comments.reverse());
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //Função para deletar um comentário
+  async function deleteComment(publicationId, commentId) {
+    console.log("Estou deletando");
+    const commentData = {
+      publicationId: publicationId,
+      commentId: commentId,
+    };
+
+    try {
+      const response = await axios.post("http://localhost:3000/deleteComment", {
+        data: commentData,
+      });
+
+      console.log(response);
+
+      if (response.status == 200) {
+        setPopUpMessage("Comentário deletado com sucesso!");
+        showPopUp();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  //Função para adicionar um comentário em uma publicação
+  async function addComment(user, id, comment) {
+    const commentData = {
+      user: user,
+      id: id,
+      comment: comment,
+    };
+
+    try {
+      const response = await axios.post(
+        "http://localhost:3000/addComment",
+        {
+          data: commentData,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.status == 200) {
+        setNewComment("");
+        setPopUpMessage("Comentário adicionado com sucesso!");
+        showPopUp();
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    const interval = setInterval(() => getAllComments(id), 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   if (typeof image == "string") image.replaceAll("\\", "/");
+
   return !edit ? (
-    <div className="flex items-center justify-center mb-10">
-      <div className={`w-9/10 min-h-[600px] shadow-lg  rounded-lg my-5 `}>
+    <div className="flex items-center justify-center border-[2px] border-gray-200 m-10 mb-10 rounded-3xl">
+      <div className={`w-9/10 min-h-[300px] rounded-lg my-5 `}>
         <div className="m-5 mb-10 flex items-center gap-2">
           <img
             src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
@@ -148,6 +230,71 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
             </button>
           </div>
         )}
+        <div className="px-5 w-full h-0.5 flex mt-10">
+          <h1 className="w-full h-full bg-gray-300 rounded-full mx-auto"></h1>
+        </div>
+        {/* Seção dos comentários */}
+        <div className="px-5 mt-10 gap-10 w-full">
+          <h1 className="mb-2 text-xl font-semibold font-montserrat">
+            Comments:
+          </h1>
+          <div className=" py-2 rounded-sm mb-5 w-full">
+            {user && (
+              <div>
+                <div className="mb-3 flex items-center gap-2">
+                  <img
+                    src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                    alt="Foto da pessoa"
+                    className="w-10 h-10 rounded-full"
+                  />
+                  <div className="flex flex-col">
+                    <h1 className="font-poppins font-medium">{user.name}</h1>
+                  </div>
+                </div>
+                <textarea
+                  placeholder="Escreva seu comentário"
+                  className="border-2 border-gray-200 w-full overflow-y-auto min-h-[50px] rounded-sm min-w-[500px] p-1 font-poppins"
+                  onChange={(e) => setNewComment(e.target.value)}
+                  value={newComment}
+                />
+                <button
+                  className="w-full h-10 cursor-pointer bg-white text-black border-2 border-black rounded-sm font-montserrat font-semibold hover:bg-black hover:text-white transition-all"
+                  onClick={() => addComment(user.name, id, newComment)}
+                >
+                  Enviar Comentário
+                </button>
+              </div>
+            )}
+          </div>
+          {comments[0] != undefined &&
+            comments.map((element, index) => {
+              return (
+                <div key={index} className=" p-2 rounded-sm mb-3">
+                  <div className="mb-1 flex items-center gap-2">
+                    <img
+                      src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                      alt="Foto da pessoa"
+                      className="w-10 h-10 rounded-full"
+                    />
+                    <div className="flex flex-col">
+                      <h1 className="font-poppins font-medium">
+                        {element.owner}
+                      </h1>
+                      <p>{element.comment}</p>
+                    </div>
+                    {user && user.name == element.owner && (
+                      <button
+                        className="cursor-pointer w-full h-full flex justify-end"
+                        onClick={() => deleteComment(id, element._id)}
+                      >
+                        <IoCloseOutline className="w-10 h-10" />
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+        </div>
       </div>
       {/* Pop Up */}
       {show &&
@@ -185,7 +332,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     edit && (
       <div className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-49">
         <div
-          className={`min-h-[600px] shadow-lg  rounded-lg my-5 bg-white flex flex-col w-6/10`}
+          className={`min-h-[600px] rounded-lg my-5 bg-white flex flex-col w-6/10`}
         >
           <div className="m-5 mb-10 flex items-center gap-2">
             <img

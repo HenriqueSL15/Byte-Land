@@ -155,7 +155,9 @@ function NewPublicationBox() {
                   closePopUp();
                 }}
               >
-                {message == "Publicação editada com sucesso!"
+                {message == "Publicação editada com sucesso!" ||
+                message == "Comentário adicionado com sucesso!" ||
+                message == "Comentário deletado com sucesso!"
                   ? "Ok"
                   : "Tentar novamente."}
               </button>
