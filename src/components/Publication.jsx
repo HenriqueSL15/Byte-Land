@@ -25,7 +25,13 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
   //Estaod sobre as edições feitas
   const [editedTitle, setEditedTitle] = useState(null);
   const [editedDescription, setEditedDescription] = useState(null);
-  const [editedImage, setEditedImage] = useState(null);
+  const [editedImage, setEditedImage] = useState(() => {
+    // Verifica se a imagem original é um arquivo (caso de recarregamento)
+    if (image instanceof Blob) return image;
+
+    //Se é uma string (caminho do servidor), mantemos como referência
+    return typeof image === "string" ? "EXISTING_IMAGE" : null;
+  });
 
   //Estado para alterar a exibição do botão para um form
   const [edit, setEdit] = useState(false);
@@ -69,9 +75,14 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
       editedDescription == null ? description : editedDescription
     );
 
+    console.log(formData);
+
     // Se uma nova imagem foi selecionada, adiciona ao FormData
-    if (editedImage instanceof File) {
+    if (editedImage instanceof Blob) {
       formData.append("image", editedImage);
+    } else if (editedImage === null) {
+      //Caso nenhum arquivo seja enviado, adiciona null
+      formData.append("image", null);
     }
 
     try {
@@ -372,11 +383,13 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
             {/* Exibe a imagem selecionada */}
             {editedImage && (
               <img
-                className="rounded-lg max-h-60"
+                className="rounded-lg max-h-60 w-auto mx-auto object-contain"
                 src={
-                  typeof editedImage == "object"
+                  editedImage instanceof Blob //Nova imagem
                     ? URL.createObjectURL(editedImage)
-                    : "http://localhost:3000/" + editedImage
+                    : editedImage === "EXISTING_IMAGE" //Imagem existente
+                    ? `http://localhost:3000/${image}`
+                    : null //Sem imagem
                 }
                 alt="Foto da publicação"
               />
@@ -401,7 +414,9 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                 <button
                   type="button"
                   className="text-black h-1/2 font-bold border-2 w-1/4 py-2 px-4 rounded-full cursor-pointer"
-                  onClick={() => setEditedImage(null)}
+                  onClick={() => {
+                    setEditedImage(null);
+                  }}
                 >
                   Delete Image
                 </button>

@@ -101,7 +101,7 @@ function NewPublicationBox() {
             <img
               src={URL.createObjectURL(image)}
               alt="Imagem selecionada"
-              className="max-w-3/4 mb-5 rounded-lg"
+              className="max-h-60 w-auto mx-auto object-contain mb-5 rounded-lg"
             />
           )}
 
