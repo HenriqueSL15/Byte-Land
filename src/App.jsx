@@ -2,6 +2,7 @@ import { useState } from "react";
 import HomePage from "./components/HomePage.jsx";
 import SignUp from "./components/SignUp.jsx";
 import Login from "./components/Login.jsx";
+import ConfigurationsPage from "./components/ConfigurationsPage.jsx";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import "./App.css";
@@ -16,6 +17,7 @@ function App() {
           <Route path="/" element={<HomePage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<SignUp />} />
+          <Route path="/configs" element={<ConfigurationsPage />} />
         </Routes>
       </Router>
     </>

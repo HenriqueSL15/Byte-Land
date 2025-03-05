@@ -3,9 +3,11 @@ import { IoIosNotifications } from "react-icons/io";
 import { LuMessageSquareText } from "react-icons/lu";
 import { FaUserFriends } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 import { useContext } from "react";
+
+import { Navigate } from "react-router-dom";
 
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
@@ -13,6 +15,9 @@ import { usePopUp } from "./PopUpContext.jsx";
 function LeftPart() {
   //Contexto do pop up
   const { show } = usePopUp();
+
+  //Navegação
+  const navigate = useNavigate();
 
   const buttons = [
     {
@@ -48,13 +53,28 @@ function LeftPart() {
     logout();
   }
 
+  function handleClick(text) {
+    if (text === "Configurações") {
+      navigate("/configs");
+    } else if (text === "Home") {
+      navigate("/");
+    } else if (text === "Sair") {
+      handleLogout();
+    }
+  }
+
   return (
     <div className={`flex flex-col p-10 h-screen text-center`}>
       {buttons.map((button) => (
-        <div key={button.id} className="flex gap-4 p-2 cursor-pointer my-3">
+        <button
+          key={button.id}
+          type="button"
+          onClick={() => handleClick(button.text)}
+          className="flex gap-4 p-2 cursor-pointer my-3"
+        >
           {button.icon}
           <p className="text-2xl font-montserrat font-medium">{button.text}</p>
-        </div>
+        </button>
       ))}
       <div className="flex flex-col mt-auto">
         <div className="flex gap-4 p-2 my-3">
