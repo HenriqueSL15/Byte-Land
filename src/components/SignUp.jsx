@@ -15,7 +15,7 @@ function SignUp() {
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
 
   //Verificação se existe conflito de email ou usuário
-  const [conflict, setConflict] = useState(null);
+  // const [conflict, setConflict] = useState(null);
 
   // Contexto de autenticação
   const { login } = useContext(AuthContext);

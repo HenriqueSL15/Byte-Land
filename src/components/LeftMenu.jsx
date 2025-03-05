@@ -38,7 +38,7 @@ function LeftMenu({ optionChange }) {
   }
 
   return (
-    <div className={`flex flex-col p-10 h-screen text-center w-1/3`}>
+    <div className={`flex flex-col fixed p-10 h-screen text-center w-1/3`}>
       {buttons.map((button) => (
         <button
           key={button.id}
