@@ -82,7 +82,12 @@ function LeftPart() {
             <div className="flex-col text-center">
               <div className="flex flex-row gap-3 mb-5">
                 <img
-                  src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                  src={
+                    user.image !=
+                    "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                      ? `http://localhost:3000/${user.image}`
+                      : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                  }
                   alt="Foto da pessoa"
                   className="w-12 h-12 rounded-full"
                 />

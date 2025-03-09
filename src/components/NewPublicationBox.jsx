@@ -31,7 +31,7 @@ function NewPublicationBox() {
     }
 
     const formData = new FormData();
-    formData.append("owner", user.name);
+    formData.append("owner", user._id); //Alterar par ao ID
     formData.append("title", title);
     formData.append("description", description);
     if (image) {
@@ -66,8 +66,9 @@ function NewPublicationBox() {
         <div className="m-5 mb-5 flex items-center gap-2">
           <img
             src={
-              user
-                ? user.image
+              user.image !=
+              "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                ? `http://localhost:3000/${user.image}`
                 : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
             }
             alt="Foto da pessoa"

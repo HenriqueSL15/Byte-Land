@@ -23,6 +23,30 @@ function MiddlePart() {
     }
   };
 
+  //   async function getOwnerInformation(ownerName = owner) {
+  //   try {
+  //     const response = await axios.get(
+  //       "http://localhost:3000/getOwnerInformation",
+  //       {
+  //         owner: owner,
+  //       },
+  //       {
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //         },
+  //       }
+  //     );
+
+  //     if (response.status == 200) {
+  //       setOwnerInfo(response.data.owner);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
+
+  console.log(publications);
+
   useEffect(() => {
     const interval = setInterval(() => fetchPublications(), 1000);
     return () => clearInterval(interval);
@@ -37,7 +61,7 @@ function MiddlePart() {
             return (
               <Publication
                 id={element._id}
-                isOwner={user ? user.name === element.owner : false}
+                isOwner={user ? user.name === element.owner.name : false}
                 key={element._id}
                 owner={element.owner}
                 title={element.title}

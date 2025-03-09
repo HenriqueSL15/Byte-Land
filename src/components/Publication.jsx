@@ -8,6 +8,7 @@ import { useContext, useEffect, useState, useCallback } from "react";
 
 import { usePopUp } from "./PopUpContext.jsx";
 import axios from "axios";
+import { set } from "mongoose";
 
 function Publication({ id, isOwner, owner, date, title, description, image }) {
   //Contexto do usuário
@@ -22,7 +23,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
   //Estado para armazenar novos comentários
   const [newComment, setNewComment] = useState("");
 
-  //Estaod sobre as edições feitas
+  //Estado sobre as edições feitas
   const [editedTitle, setEditedTitle] = useState(null);
   const [editedDescription, setEditedDescription] = useState(null);
   const [editedImage, setEditedImage] = useState(() => {
@@ -143,9 +144,9 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
   }
 
   //Função para adicionar um comentário em uma publicação
-  async function addComment(user, id, comment) {
+  async function addComment(userId, id, comment) {
     const commentData = {
-      user: user,
+      user: userId,
       id: id,
       comment: comment,
     };
@@ -186,12 +187,13 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
       <div className={`w-9/10 min-h-[300px] rounded-lg my-5 `}>
         <div className="m-5 mb-10 flex items-center gap-2">
           <img
-            src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
+            src={`http://localhost:3000/${owner.image}`}
+            // "https://cdn-icons-png.flaticon.com/512/711/711769.png"
             alt="Foto da pessoa"
             className="w-12 h-12 rounded-full"
           />
           <div className="flex flex-col">
-            <h1 className="text-2xl font-poppins font-medium">{owner}</h1>
+            <h1 className="text-2xl font-poppins font-medium">{owner.name}</h1>
             <h2 className="text-sm text-gray-600 font-poppins">
               {new Date(date).toLocaleString("pt-BR")}
             </h2>
@@ -254,7 +256,12 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
               <div>
                 <div className="mb-3 flex items-center gap-2">
                   <img
-                    src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                    src={
+                      user.image !=
+                      "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                        ? "http://localhost:3000/" + user.image
+                        : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                    }
                     alt="Foto da pessoa"
                     className="w-10 h-10 rounded-full"
                   />
@@ -270,7 +277,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                 />
                 <button
                   className="w-full h-10 cursor-pointer bg-white text-black border-2 border-black rounded-sm font-montserrat font-semibold hover:bg-black hover:text-white transition-all"
-                  onClick={() => addComment(user.name, id, newComment)}
+                  onClick={() => addComment(user._id, id, newComment)}
                 >
                   Enviar Comentário
                 </button>
@@ -281,21 +288,28 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
             comments.map((element, index) => {
               return (
                 <div key={index} className=" p-2 rounded-sm mb-3">
-                  <div className="mb-1 flex items-center gap-2">
-                    <img
-                      src="https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                      alt="Foto da pessoa"
-                      className="w-10 h-10 rounded-full"
-                    />
-                    <div className="flex flex-col">
-                      <h1 className="font-poppins font-medium">
-                        {element.owner}
-                      </h1>
-                      <p>{element.comment}</p>
+                  <div className="mb-1 flex items-center justify-between">
+                    <div className="flex">
+                      <img
+                        src={
+                          element.owner.image !=
+                          "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                            ? `http://localhost:3000/${element.owner.image}`
+                            : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                        }
+                        alt="Foto da pessoa"
+                        className="w-10 h-10 rounded-full"
+                      />
+                      <div className="flex flex-col">
+                        <h1 className="font-poppins font-medium">
+                          {element.owner.name}
+                        </h1>
+                        <p>{element.comment}</p>
+                      </div>
                     </div>
-                    {user && user.name == element.owner && (
+                    {user && user.name == element.owner.name && (
                       <button
-                        className="cursor-pointer w-full h-full flex justify-end"
+                        className="cursor-pointer w-10 h-full flex justify-end"
                         onClick={() => deleteComment(id, element._id)}
                       >
                         <IoCloseOutline className="w-10 h-10" />
