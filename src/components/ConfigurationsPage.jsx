@@ -1,6 +1,7 @@
 import LeftMenu from "./LeftMenu.jsx";
 import { useState } from "react";
-import UserConfigPage from "./UserConfigPage";
+import UserConfigPage from "./UserConfigPage.jsx";
+import UserSecurityPage from "./UserSecurityPage.jsx";
 
 function ConfigurationsPage() {
   const [option, setOption] = useState("Informações do Usuário");
@@ -10,6 +11,11 @@ function ConfigurationsPage() {
       id: 1,
       text: "Informações do Usuário",
       element: <UserConfigPage />,
+    },
+    {
+      id: 2,
+      text: "Segurança",
+      element: <UserSecurityPage />,
     },
   ];
 
@@ -23,9 +29,7 @@ function ConfigurationsPage() {
       </div>
       <div className="flex flex-col w-full">
         {options.map((curOption) => {
-          console.log(curOption.text);
           if (curOption.text === option) {
-            console.log(curOption.text);
             return curOption.element;
           }
         })}
