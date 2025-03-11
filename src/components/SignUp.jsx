@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
 import axios from "axios";
+import PasswordValidator from "password-validator";
 
 import { LuEye } from "react-icons/lu";
 import { LuEyeClosed } from "react-icons/lu";
@@ -39,6 +40,52 @@ function SignUp() {
 
   const [showPassword1, setShowPassword1] = useState(false);
   const [showPassword2, setShowPassword2] = useState(false);
+
+  const [errors, setErrors] = useState([]);
+  const [isInitial, setIsInitial] = useState(true);
+
+  const typeOfErrors = [
+    { text: "Pelo menos 8 caracteres", name: "min" },
+    { text: "Pelo menos 1 caractere maiúsculo", name: "uppercase" },
+    { text: "Pelo menos 1 caractere minúsculo", name: "lowercase" },
+    { text: "Pelo menos 1 número", name: "digits" },
+    { text: "Pelo menos 1 caractere especial", name: "symbols" },
+    { text: "Sem nenhum espaço", name: "spaces" },
+  ];
+
+  const schema = new PasswordValidator();
+
+  schema
+    .is()
+    .min(8)
+    .has()
+    .uppercase()
+    .has()
+    .lowercase()
+    .has()
+    .digits()
+    .has()
+    .symbols()
+    .has()
+    .not()
+    .spaces();
+
+  useEffect(() => {
+    if (password1) {
+      const validationErrors = schema.validate(password1, { details: true });
+      setErrors(validationErrors);
+      setIsInitial(false);
+    } else {
+      setErrors([]); // Limpa os erros se o campo estiver vazio
+      setIsInitial(true);
+    }
+    console.log(errors);
+  }, [password1]);
+
+  // Verifica se uma regra está presente nos erros
+  function isRuleError(ruleName) {
+    return errors.some((error) => error.validation === ruleName);
+  }
 
   // Alteração do Usuário
   function handleUserChange(event) {
@@ -164,11 +211,11 @@ function SignUp() {
                 className={`
                 w-full px-2 py-1 rounded-lg border border-gray-300
                 ${
-                  isPasswordValid === null
-                    ? "border-gray-300 focus:border-gray-500" // Cor padrão (cinza) quando o campo está vazio
-                    : isPasswordValid
-                    ? "border-green-500 focus:border-green-500" // Verde se o email for válido
-                    : "border-red-500 focus:border-red-500" // Vermelho se o email for inválido
+                  isInitial
+                    ? "border-gray-300 "
+                    : errors.length > 0
+                    ? "border-red-500 focus:border-red-500"
+                    : "border-green-500 focus:border-green-500"
                 }
                  focus:outline-none focus:scale-101 transition-all
               `}
@@ -184,6 +231,21 @@ function SignUp() {
                   <LuEye className="w-5 h-5" />
                 )}
               </button>
+            </div>
+            <div className="font-funnel-sans ml-1 flex flex-col gap-1 mt-1">
+              {typeOfErrors.map((rule) => (
+                <p
+                  key={rule.name}
+                  className={`${
+                    isInitial || isRuleError(rule.name)
+                      ? "text-red-500"
+                      : "text-green-500"
+                  }
+                  `}
+                >
+                  *{rule.text}
+                </p>
+              ))}
             </div>
           </div>
 
@@ -240,7 +302,12 @@ function SignUp() {
                   : "border-2 border-red-500  cursor-not-allowed"
               } hover:scale-105 transition-all`}
               onClick={() => {
-                if (isEmailValid && isPasswordValid && user != "") {
+                if (
+                  isEmailValid &&
+                  isPasswordValid &&
+                  user != "" &&
+                  errors.length == 0
+                ) {
                   handleSignUpSubmit();
                 } else if (
                   user == "" ||

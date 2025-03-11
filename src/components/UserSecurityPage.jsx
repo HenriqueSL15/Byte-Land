@@ -1,12 +1,64 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "./AuthContext.jsx";
 import axios from "axios";
+import PasswordValidator from "password-validator";
 
 function UserSecurityPage() {
   const { user } = useContext(AuthContext);
 
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+
+  const [errors, setErrors] = useState([]);
+  const [isInitial, setIsInitial] = useState(true);
+
+  const typeOfErrors = [
+    { text: "Pelo menos 8 caracteres", name: "min" },
+    { text: "Pelo menos 1 caractere maiúsculo", name: "uppercase" },
+    { text: "Pelo menos 1 caractere minúsculo", name: "lowercase" },
+    { text: "Pelo menos 1 número", name: "digits" },
+    { text: "Pelo menos 1 caractere especial", name: "symbols" },
+    { text: "Sem nenhum espaço", name: "spaces" },
+  ];
+
+  const schema = new PasswordValidator();
+
+  schema
+    .is()
+    .min(8)
+    .has()
+    .uppercase()
+    .has()
+    .lowercase()
+    .has()
+    .digits()
+    .has()
+    .symbols()
+    .has()
+    .not()
+    .spaces();
+
+  useEffect(() => {
+    if (newPassword) {
+      const validationErrors = schema.validate(newPassword, { details: true });
+      setErrors(validationErrors);
+      setIsInitial(false);
+    } else {
+      setErrors([]); // Limpa os erros se o campo estiver vazio
+      setIsInitial(true);
+    }
+  }, [newPassword]);
+
+  // async function verifyPassword(password) {
+  //   const errors = schema.validate(password, { details: true });
+
+  //   if (errors.length > 0) {
+  //     setErrors(errors);
+  //     return false;
+  //   }
+
+  //   return true;
+  // }
 
   async function handleSubmit(userID, newPassword, oldPassword) {
     try {
@@ -34,6 +86,11 @@ function UserSecurityPage() {
     }
   }
 
+  // Verifica se uma regra está presente nos erros
+  function isRuleError(ruleName) {
+    return errors.some((error) => error.validation === ruleName);
+  }
+
   return (
     <div className="min-h-screen flex justify-end items-top border-l-2">
       <div className="flex flex-col w-9/10">
@@ -58,19 +115,47 @@ function UserSecurityPage() {
               Nova Senha:
             </h2>
             <input
-              className="border-2 border-gray-300 rounded-lg min-h-10 w-full p-2 font-funnel-sans"
+              className={`border-2 rounded-lg min-h-10 w-full p-2 font-funnel-sans focus:outline-none ${
+                isInitial
+                  ? "border-gray-300"
+                  : errors.length > 0
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-green-500 focus:border-green-500"
+              }}`}
               placeholder="Digite a nova senha"
-              onChange={(e) => setNewPassword(e.target.value)}
+              onChange={(e) => {
+                setNewPassword(e.target.value);
+              }}
               value={newPassword}
               type="text"
             />
+            <div className="font-funnel-sans ml-1 flex flex-col gap-1 mt-1">
+              {typeOfErrors.map((rule) => (
+                <p
+                  key={rule.name}
+                  className={`${
+                    isInitial || isRuleError(rule.name)
+                      ? "text-red-500"
+                      : "text-green-500"
+                  }
+                  `}
+                >
+                  *{rule.text}
+                </p>
+              ))}
+            </div>
           </div>
           <div className="w-full min-h-24 ">
             <div className="flex justify-center items-center">
               <button
                 type="button"
                 onClick={() => handleSubmit(user._id, newPassword, oldPassword)}
-                className="border-2 border-black p-10 cursor-pointer hover:bg-black hover:text-white transition-all font-bold py-2 px-4 rounded"
+                className={`bg-white transform transition-all border-2 border-black p-10 font-bold py-2 px-4 rounded ${
+                  isInitial || errors.length > 0
+                    ? "border-red-500  cursor-not-allowed hover:scale-110"
+                    : "cursor-pointer  border-green-500 hover:scale-110"
+                } `}
+                disabled={errors.length > 0}
               >
                 Alterar
               </button>

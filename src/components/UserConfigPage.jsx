@@ -112,8 +112,9 @@ function UserConfigPage() {
               Foto de Perfil{" "}
               <img
                 src={
+                  user &&
                   user.image !=
-                  "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                    "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                     ? `http://localhost:3000/${user.image}`
                     : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                 }
