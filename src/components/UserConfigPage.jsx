@@ -1,6 +1,7 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
 import { CiImageOn } from "react-icons/ci";
 import { AuthContext } from "./AuthContext.jsx";
+import validator from "validator";
 import axios from "axios";
 
 function UserConfigPage() {
@@ -10,6 +11,9 @@ function UserConfigPage() {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const isEmailValid = email != "" && email != null && validator.isEmail(email);
+
+  const [isEmailInitial, setIsEmailInitial] = useState(true);
 
   const [image, setImage] = useState("");
   const [imagePreview, setImagePreview] = useState("");
@@ -39,8 +43,15 @@ function UserConfigPage() {
 
   async function handleSubmit() {
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("email", email);
+
+    if (name != "" && name != null) {
+      formData.append("name", name);
+    }
+
+    if (isEmailValid) {
+      formData.append("email", email);
+    }
+
     if (image) {
       formData.append("image", image);
       console.log(image);
@@ -76,6 +87,14 @@ function UserConfigPage() {
     };
   }, [image]);
 
+  useEffect(() => {
+    if (!email) {
+      setIsEmailInitial(true);
+    } else {
+      setIsEmailInitial(false);
+    }
+  }, [email]);
+
   return (
     <div className="min-h-screen flex justify-end items-top border-l-2">
       <div className="flex flex-col w-9/10">
@@ -100,7 +119,13 @@ function UserConfigPage() {
               Email <p className="text-gray-500">{user && user.email}</p>
             </h2>
             <input
-              className="border-2 border-gray-300 rounded-lg min-h-10 w-full p-2 font-funnel-sans"
+              className={`border-2 border-gray-300 rounded-lg min-h-10 w-full p-2 font-funnel-sans focus:outline-none ${
+                isEmailInitial
+                  ? "border-gray-300"
+                  : isEmailValid
+                  ? "border-green-500 focus:border-green-500"
+                  : "border-red-500 focus:border-red-500"
+              }`}
               placeholder="Digite o email para alteração"
               onChange={(e) => setEmail(e.target.value)}
               value={email}

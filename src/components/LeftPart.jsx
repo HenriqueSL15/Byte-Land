@@ -91,9 +91,13 @@ function LeftPart() {
                   alt="Foto da pessoa"
                   className="w-12 h-12 rounded-full"
                 />
-                <h1 className="text-2xl pt-3 cursor-pointer font-montserrat font-medium text-gray-600 border-b-2 border-gray-400 mt-auto mb-2 hover:border-gray-600 hover:text-gray-900 transition-all">
+                <button
+                  type="button"
+                  className="text-2xl pt-3 cursor-pointer font-montserrat font-medium text-gray-600 border-b-2 border-gray-400 mt-auto mb-2 hover:border-gray-600 hover:text-gray-900 transition-all"
+                  onClick={() => navigate("/userPage")}
+                >
                   {user.name}
-                </h1>
+                </button>
               </div>
               <button
                 type="button"

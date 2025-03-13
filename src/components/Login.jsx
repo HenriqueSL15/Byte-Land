@@ -64,13 +64,15 @@ function Login() {
       }
     } catch (error) {
       console.log(error);
-      if (
-        error.response.data.message == "O email ou a senha estão incorretos!"
-      ) {
-        console.log("Deu errado");
-        setPopUpMessage(error.response.data.message);
-        showPopUp();
-      }
+      setPopUpMessage(error.response.data.message);
+      showPopUp();
+      // if (
+      //   error.response.data.message == "O email ou a senha estão incorretos!"
+      // ) {
+      //   console.log("Deu errado");
+      //   setPopUpMessage(error.response.data.message);
+      //   showPopUp();
+      // }
     }
     console.log(`Email: ${email}\nSenha: ${password}`);
   }
