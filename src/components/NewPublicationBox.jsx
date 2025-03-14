@@ -141,8 +141,8 @@ function NewPublicationBox() {
         </div>
       </div>
       {show &&
-        message !=
-          "Deseja editar essa publicação? Essa ação não tem retorno." && (
+        (message == "Comentário adicionando com sucesso!" ||
+          message == "Comentário deletado com sucesso!") && (
           <div className="fixed inset-0 flex justify-center items-center bg-gray-900/50 z-50">
             <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130 ">
               <p className="text-red-500 text-center font-poppins text-sm font-semibold">
@@ -156,8 +156,7 @@ function NewPublicationBox() {
                   closePopUp();
                 }}
               >
-                {message == "Publicação editada com sucesso!" ||
-                message == "Comentário adicionado com sucesso!" ||
+                {message == "Comentário adicionado com sucesso!" ||
                 message == "Comentário deletado com sucesso!"
                   ? "Ok"
                   : "Tentar novamente."}

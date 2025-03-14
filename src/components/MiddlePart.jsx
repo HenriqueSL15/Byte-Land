@@ -45,8 +45,6 @@ function MiddlePart() {
   //   }
   // }
 
-  console.log(publications);
-
   useEffect(() => {
     const interval = setInterval(() => fetchPublications(), 1000);
     return () => clearInterval(interval);
