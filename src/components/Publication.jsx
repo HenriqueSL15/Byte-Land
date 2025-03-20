@@ -38,7 +38,6 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       setEditedImage(file);
-      console.log("Image:", file);
     }
   };
 

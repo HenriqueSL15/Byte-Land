@@ -1,13 +1,24 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import LeftPart from "./LeftPart.jsx";
 import RightPart from "./RightPart.jsx";
 import axios from "axios";
 import Publication from "./Publication.jsx";
+import { CiImageOn } from "react-icons/ci";
+import { IoCloseOutline } from "react-icons/io5";
 import { AuthContext } from "./AuthContext.jsx";
+
+import { usePopUp } from "./PopUpContext.jsx";
 
 function UserPage() {
   const { user } = useContext(AuthContext);
   const [userPosts, setUserPosts] = useState([]);
+  const [editInfo, setEditInfo] = useState(false);
+
+  const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
+  const fileInputRef = React.useRef(null);
+
+  const [editedImage, setEditedImage] = useState(null);
+  const [editedDescription, setEditedDescription] = useState(null);
 
   async function getUserPosts() {
     try {
@@ -39,6 +50,37 @@ function UserPage() {
     }
   }
 
+  function renderPopUps() {
+    if (!show) return null;
+
+    return (
+      <>
+        <div className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-50">
+          <div className="bg-white p-6 w-1/12 h-1/12"></div>
+        </div>
+      </>
+    );
+  }
+
+  const handleDeleteImage = () => {
+    setEditedImage(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // Reseta o valor do input
+    }
+  };
+
+  useEffect(() => {
+    console.log(editedDescription);
+  }, [editedDescription]);
+
+  // Função para alterar a imagem
+  const handleImageChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      const file = event.target.files[0];
+      setEditedImage(file);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       getUserPosts(); // Busca inicial
@@ -61,7 +103,7 @@ function UserPage() {
         <LeftPart />
       </div>
       <div className="w-6/12 border-x-2 border-gray-300 overflow-y-scroll scrollbar-hide relative">
-        <div className="h-screen w-full p-5 flex flex-col gap-36">
+        <div className="h-screen w-full p-5 flex flex-col gap-36 ">
           <div className="relative pb-14">
             <img
               src={user ? `http://localhost:3000/${user.image}` : ""}
@@ -84,7 +126,13 @@ function UserPage() {
                   sunt
                 </p>
               </div>
-              <button className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12">
+              <button
+                type="button"
+                className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
+                onClick={() => {
+                  setEditInfo(true);
+                }}
+              >
                 Edit Profile
               </button>
             </div>
@@ -110,6 +158,66 @@ function UserPage() {
             </div>
           </div>
         </div>
+        {editInfo && (
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-50">
+            <div className="bg-white p-6 w-1/2 min-h-5/6 rounded-lg border-1 border-black relative">
+              <button
+                className="absolute right-4 w-14 h-14 cursor-pointer transform hover:scale-110 transition-all"
+                onClick={() => setEditInfo(false)}
+              >
+                <IoCloseOutline className="h-full w-full" />
+              </button>
+              <h1 className="text-3xl font-semibold font-montserrat mt-3 text-center">
+                Editar informações do perfil
+              </h1>
+              <div className="flex flex-col gap-3 mt-10">
+                <h2 className="text-lg font-poppins">Descrição</h2>
+                <textarea
+                  className="bg-[#f2f2f2] font-funnel-sans placeholder-[#979797] rounded-sm min-h-32 p-2 w-full border-1 border-[#979797]"
+                  placeholder="Escreva sua nova descrição"
+                  onChange={(e) => setEditedDescription(event.target.value)}
+                  value={editedDescription}
+                ></textarea>
+              </div>
+              <div className="flex flex-col gap-3 mt-10">
+                <h2 className="text-lg font-poppins">Imagem de Fundo</h2>
+                <div className="flex flex-col gap-3 items-center">
+                  <label className="bg-[#f2f2f2] w-full min-h-44 border-1 border-[#979797] rounded-sm cursor-pointer flex items-center justify-center">
+                    {!editedImage ? (
+                      <CiImageOn className="w-full h-32" />
+                    ) : (
+                      <img
+                        src={URL.createObjectURL(editedImage)}
+                        alt="Imagem selecionada"
+                        className="min-h-36 max-h-36 w-auto"
+                        value={editedImage}
+                      />
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleImageChange}
+                      ref={fileInputRef}
+                    />
+                  </label>
+                  {editedImage && (
+                    <button
+                      onClick={handleDeleteImage}
+                      className="transform border-1 border-black bg-white w-1/3 rounded-lg p-1 hover:text-red-500 hover:border-red-500 hover:scale-101  transition-all cursor-pointer"
+                    >
+                      Remover Imagem
+                    </button>
+                  )}
+                </div>
+                <button className="hover:scale-101 transform transition-all bg-black text-white font-bold p-3 rounded-full cursor-pointer">
+                  Salvar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* {renderPopUps()} */}
       </div>
       <div className="w-3/12">
         <RightPart />
