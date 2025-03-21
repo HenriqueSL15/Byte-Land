@@ -5,7 +5,7 @@ import validator from "validator";
 import axios from "axios";
 
 function UserConfigPage() {
-  const { user } = useContext(AuthContext);
+  const { user, login } = useContext(AuthContext);
 
   const fileInputRef = useRef(null);
 
@@ -17,8 +17,6 @@ function UserConfigPage() {
 
   const [image, setImage] = useState("");
   const [imagePreview, setImagePreview] = useState("");
-
-  const { login } = useContext(AuthContext);
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];

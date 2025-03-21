@@ -10,9 +10,11 @@ import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
 
 function UserPage() {
-  const { user } = useContext(AuthContext);
+  const { user, login } = useContext(AuthContext);
   const [userPosts, setUserPosts] = useState([]);
   const [editInfo, setEditInfo] = useState(false);
+
+  // console.log(user);
 
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
   const fileInputRef = React.useRef(null);
@@ -43,7 +45,7 @@ function UserPage() {
 
       if (response.status === 200) {
         setUserPosts(response.data.posts);
-        // console.log("Posts do usuário foram recebidos com sucesso!");
+        console.log("Posts do usuário foram recebidos com sucesso!");
       }
     } catch (error) {
       console.log(error);
@@ -81,6 +83,35 @@ function UserPage() {
     }
   };
 
+  async function handleSaveChanges() {
+    const formData = new FormData();
+    formData.append("image", editedImage);
+    formData.append("description", editedDescription);
+    formData.append("userId", user._id);
+
+    try {
+      const response = await axios.put(
+        "http://localhost:3000/editUserPageInformation",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("Informações do usuário atualizados com sucesso!");
+        login(response.data.user);
+        setEditedDescription("");
+        setEditedImage(null);
+        setEditInfo(false);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   useEffect(() => {
     if (user) {
       getUserPosts(); // Busca inicial
@@ -106,24 +137,33 @@ function UserPage() {
         <div className="h-screen w-full p-5 flex flex-col gap-36 ">
           <div className="relative pb-14">
             <img
-              src={user ? `http://localhost:3000/${user.image}` : ""}
-              className="absolute bottom-0 left-3 h-32 w-32 bg-black rounded-full z-48 border-3 border-white shadow-md "
+              src={
+                user.image !=
+                "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                  ? `http://localhost:3000/${user.image}`
+                  : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+              }
+              className="absolute bg-white bottom-0 left-3 h-32 w-32 g-black rounded-full z-50 border-3 border-white shadow-md "
               alt="Imagem do Usuário"
             />
             <img
-              src="https://preview.redd.it/oupwnwwcn8fe1.jpeg?auto=webp&s=bb26424933e0ec767facc328ab0c53e3c892fae3"
+              src={
+                user.userPageImage !=
+                "https://www.solidbackgrounds.com/images/1920x1080/1920x1080-black-solid-color-background.jpg"
+                  ? `http://localhost:3000/${user.userPageImage}`
+                  : "https://www.solidbackgrounds.com/images/1920x1080/1920x1080-black-solid-color-background.jpg"
+              }
               alt="Imagem do Perfil do Usuário"
               className="rounded-lg w-full h-72 z-40"
             />
-            <div className="absolute left-36 top-[87%] max-w-[650px] flex justify-between items-center">
+            <div className="absolute left-36 top-[87%] min-w-[590px] max-w-[650px] flex justify-between items-center">
               <div className="flex flex-col w-[75%]">
                 <h1 className="font-funnel-sans text-2xl mb-1">
                   {user ? user.name : "Não possui nome"}
                 </h1>
+                {console.log(user.userPageDescription)}
                 <p className="font-funnel-sans text-lg text-[#979797]">
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                  Explicabo placeat nemo quod beatae natus dolore, accusamus,
-                  sunt
+                  {user ? user.userPageDescription : "Não possui descrição"}
                 </p>
               </div>
               <button
@@ -175,7 +215,7 @@ function UserPage() {
                 <textarea
                   className="bg-[#f2f2f2] font-funnel-sans placeholder-[#979797] rounded-sm min-h-32 p-2 w-full border-1 border-[#979797]"
                   placeholder="Escreva sua nova descrição"
-                  onChange={(e) => setEditedDescription(event.target.value)}
+                  onChange={(e) => setEditedDescription(e.target.value)}
                   value={editedDescription}
                 ></textarea>
               </div>
@@ -210,7 +250,10 @@ function UserPage() {
                     </button>
                   )}
                 </div>
-                <button className="hover:scale-101 transform transition-all bg-black text-white font-bold p-3 rounded-full cursor-pointer">
+                <button
+                  onClick={() => handleSaveChanges()}
+                  className="hover:scale-101 transform transition-all bg-black text-white font-bold p-3 rounded-full cursor-pointer"
+                >
                   Salvar
                 </button>
               </div>

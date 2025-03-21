@@ -244,7 +244,12 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
             {/* Conteúdo da publicação */}
             <div className="m-5 mb-10 flex items-center gap-2">
               <img
-                src={`http://localhost:3000/${owner.image}`}
+                src={
+                  owner.image !=
+                  "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                    ? `http://localhost:3000/${owner.image}`
+                    : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                }
                 alt="Foto da pessoa"
                 className="w-12 h-12 rounded-full"
               />
@@ -387,7 +392,12 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
               {/* Conteúdo do formulário de edição */}
               <div className="m-5 mb-10 flex items-center gap-2">
                 <img
-                  src={"http://localhost:3000/" + owner.image}
+                  src={
+                    owner.image !=
+                    "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                      ? `http://localhost:3000/${owner.image}`
+                      : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                  }
                   alt="Foto da pessoa"
                   className="w-12 h-12 rounded-full"
                 />
