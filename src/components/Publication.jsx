@@ -19,6 +19,8 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
   // Estado para mostrar ou não o botão de deletar publicação
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
 
+  const newCommentLimit = 125;
+
   // Estado para armazenar os comentários
   const [comments, setComments] = useState([]);
 
@@ -330,12 +332,25 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                         </h1>
                       </div>
                     </div>
-                    <textarea
-                      placeholder="Escreva seu comentário"
-                      className="border-2 border-gray-200 w-full overflow-y-auto min-h-[50px] rounded-sm min-w-[500px] p-1 font-poppins"
-                      onChange={(e) => setNewComment(e.target.value)}
-                      value={newComment}
-                    />
+                    <div className="relative w-full">
+                      <textarea
+                        placeholder="Escreva seu comentário"
+                        className="border-2 border-gray-200 w-full overflow-y-auto min-h-[50px] rounded-sm min-w-[500px] p-1 font-poppins"
+                        onChange={(e) => {
+                          if (e.target.value.length <= newCommentLimit) {
+                            setNewComment(e.target.value);
+                          }
+                        }}
+                        value={newComment}
+                      />
+                      <h2
+                        className={`text-[15px] select-none absolute right-2 bottom-17 ${
+                          newComment.length == newCommentLimit && "text-red-500"
+                        } `}
+                      >
+                        {newComment.length}/{newCommentLimit}
+                      </h2>
+                    </div>
                     <button
                       className="w-full h-10 cursor-pointer bg-white text-black border-2 border-black rounded-sm font-montserrat font-semibold hover:bg-black hover:text-white transition-all"
                       onClick={() => addComment(user._id, id, newComment)}
@@ -372,7 +387,9 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                             <h1 className="font-poppins font-medium text-start">
                               {element.owner.name}
                             </h1>
-                            <p>{element.comment}</p>
+                            <p className="text-start w-[450px] break-words">
+                              {element.comment}
+                            </p>
                           </div>
                         </button>
                         {user && user.name == element.owner.name && (
@@ -433,12 +450,14 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   defaultValue={title}
                   onChange={(e) => setEditedTitle(e.target.value)}
                 />
+
                 <textarea
                   className="text-base text-gray-800 w-full font-funnel-sans mb-5 overflow-y-scroll scrollbar-hide h-[200px] p-2 border-1 border-gray-500 rounded-lg"
                   placeholder="Conteúdo da publicação"
                   defaultValue={description}
                   onChange={(e) => setEditedDescription(e.target.value)}
                 />
+
                 {/* Exibe a imagem selecionada */}
                 {editedImage && (
                   <img

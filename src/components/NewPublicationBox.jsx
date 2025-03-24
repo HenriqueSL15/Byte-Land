@@ -13,6 +13,9 @@ function NewPublicationBox() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
+  const titleLimit = 100;
+  const descriptionLimit = 500;
+
   const { user } = useContext(AuthContext);
 
   const handleImageChange = (event) => {
@@ -82,19 +85,45 @@ function NewPublicationBox() {
         </div>
         <div className="m-5 flex flex-col justify-center">
           <div className="flex flex-col items-center">
-            <input
-              type="text"
-              className="text-2xl mb-3 p-2 border-b-1 w-full font-montserrat"
-              placeholder="Título da publicação"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-            <textarea
-              className="text-base text-gray-800 w-full font-funnel-sans mb-5 overflow-y-scroll scrollbar-hide h-[200px] p-2 border-1 border-gray-500 rounded-lg"
-              placeholder="Conteúdo da publicação"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
+            <div className="w-full relative">
+              <input
+                type="text"
+                className={`text-2xl mb-3 px-2 pt-2 pb-0 border-b-1 w-full font-montserrat focus:outline-none focus:border-b-2`}
+                placeholder="Título da publicação"
+                value={title}
+                onChange={(e) => {
+                  if (e.target.value.length <= titleLimit) {
+                    setTitle(e.target.value);
+                  }
+                }}
+              />
+              <h2
+                className={`text-[15px] select-none absolute right-1 bottom-11 ${
+                  title.length == titleLimit && "text-red-500"
+                } `}
+              >
+                {title.length}/{titleLimit}
+              </h2>
+            </div>
+            <div className="w-full relative">
+              <textarea
+                className="text-base text-gray-800 w-full font-funnel-sans   mb-5 overflow-y-scroll scrollbar-hide h-[200px] p-2 border-1 border-gray-500 rounded-lg"
+                placeholder="Conteúdo da publicação"
+                value={description}
+                onChange={(e) => {
+                  if (e.target.value.length <= descriptionLimit) {
+                    setDescription(e.target.value);
+                  }
+                }}
+              />
+              <h2
+                className={`text-[15px] select-none absolute right-2 bottom-7   ${
+                  description.length == descriptionLimit && "text-red-500"
+                } `}
+              >
+                {description.length}/{descriptionLimit}
+              </h2>
+            </div>
           </div>
 
           {/* Exibe a imagem selecionada */}
