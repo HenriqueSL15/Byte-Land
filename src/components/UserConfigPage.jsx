@@ -55,11 +55,9 @@ function UserConfigPage() {
       console.log(image);
     }
 
-    formData.append("userId", user._id);
-
     try {
       const response = await axios.put(
-        "http://localhost:3000/editProfile",
+        `http://localhost:3000/users/${user._id}`,
         formData,
         {
           headers: {
@@ -69,7 +67,10 @@ function UserConfigPage() {
       );
 
       if (response.status == 200) {
-        console.log("Perfil atualizado com sucesso!", response.data);
+        setName("");
+        setEmail("");
+        setImage("");
+        setImagePreview("");
         login(response.data.user);
       }
     } catch (error) {

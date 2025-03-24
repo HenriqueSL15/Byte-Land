@@ -49,23 +49,11 @@ function UserSecurityPage() {
     }
   }, [newPassword]);
 
-  // async function verifyPassword(password) {
-  //   const errors = schema.validate(password, { details: true });
-
-  //   if (errors.length > 0) {
-  //     setErrors(errors);
-  //     return false;
-  //   }
-
-  //   return true;
-  // }
-
-  async function handleSubmit(userID, newPassword, oldPassword) {
+  async function handleSubmit(userId, newPassword, oldPassword) {
     try {
-      const response = await axios.post(
-        "http://localhost:3000/changePassword",
+      const response = await axios.put(
+        `http://localhost:3000/users/${userId}/password`,
         {
-          userID: userID,
           newPassword: newPassword,
           oldPassword: oldPassword,
         },

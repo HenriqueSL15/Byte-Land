@@ -5,11 +5,14 @@ import { IoCloseOutline } from "react-icons/io5";
 import { IoSend } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
 import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 import { usePopUp } from "./PopUpContext.jsx";
 import axios from "axios";
 
 function Publication({ id, isOwner, owner, date, title, description, image }) {
+  const navigate = useNavigate();
+
   // Contexto do usuário
   const { user } = useContext(AuthContext);
 
@@ -44,12 +47,11 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
   // Função para deletar a publicação
   const handleDeletePublication = async (id, owner) => {
     const publicationData = {
-      id: id,
       owner: owner,
     };
 
     const response = await axios.delete(
-      `http://localhost:3000/deletePublication`,
+      `http://localhost:3000/publications/${id}`,
       {
         data: publicationData,
       }
@@ -75,7 +77,6 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     const formData = new FormData();
 
     formData.append("owner", owner);
-    formData.append("id", id);
     formData.append("title", editedTitle);
     formData.append("description", editedDescription);
 
@@ -87,7 +88,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
 
     try {
       const response = await axios.put(
-        `http://localhost:3000/editPublication`,
+        `http://localhost:3000/publications/${id}`,
         formData,
         { "Content-Type": "multipart/form-data" }
       );
@@ -104,11 +105,11 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
   }
 
   // Função para obter todos os comentários da publicação
-  async function getAllComments(id) {
+  async function getAllComments(publicationId) {
     try {
-      const response = await axios.post("http://localhost:3000/getComments", {
-        data: { id: id },
-      });
+      const response = await axios.get(
+        `http://localhost:3000/publications/${publicationId}/comments`
+      );
 
       if (response.status == 200) {
         setComments(response.data.comments.reverse());
@@ -120,15 +121,10 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
 
   // Função para deletar um comentário
   async function deleteComment(publicationId, commentId) {
-    const commentData = {
-      publicationId: publicationId,
-      commentId: commentId,
-    };
-
     try {
-      const response = await axios.post("http://localhost:3000/deleteComment", {
-        data: commentData,
-      });
+      const response = await axios.delete(
+        `http://localhost:3000/publications/${publicationId}/comments/${commentId}`
+      );
 
       if (response.status == 200) {
         setPopUpMessage("Comentário deletado com sucesso!");
@@ -140,16 +136,16 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
   }
 
   // Função para adicionar um comentário em uma publicação
-  async function addComment(userId, id, comment) {
+  async function addComment(userId, publicationId, comment) {
     const commentData = {
       user: userId,
-      id: id,
+      id: publicationId,
       comment: comment,
     };
 
     try {
       const response = await axios.post(
-        "http://localhost:3000/addComment",
+        `http://localhost:3000/publications/${publicationId}/comments`,
         {
           data: commentData,
         },
@@ -242,7 +238,11 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
         <div className="flex items-center justify-center border-[2px] border-gray-200 m-10 mb-10 rounded-3xl">
           <div className={`w-9/10 min-h-[300px] rounded-lg my-5`}>
             {/* Conteúdo da publicação */}
-            <div className="m-5 mb-10 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => navigate(`/userPage/${owner._id}`)}
+              className="m-5 mb-10 flex cursor-pointer gap-2"
+            >
               <img
                 src={
                   owner.image !=
@@ -254,14 +254,14 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                 className="w-12 h-12 rounded-full"
               />
               <div className="flex flex-col">
-                <h1 className="text-2xl font-poppins font-medium">
+                <h1 className="text-2xl text-start font-poppins font-medium">
                   {owner.name}
                 </h1>
                 <h2 className="text-sm text-gray-600 font-poppins">
                   {new Date(date).toLocaleString("pt-BR")}
                 </h2>
               </div>
-            </div>
+            </button>
             <div className="m-5 overflow-y-auto scrollbar-hide">
               <h1 className="text-2xl mb-3 font-funnel-sans">{title}</h1>
               <h2 className="text-base text-gray-800 mb-5 font-funnel-sans">
@@ -345,12 +345,19 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   </div>
                 )}
               </div>
+
               {comments[0] != undefined &&
                 comments.map((element, index) => {
                   return (
                     <div key={index} className="p-2 rounded-sm mb-3">
                       <div className="mb-1 flex items-center justify-between">
-                        <div className="flex">
+                        <button
+                          type="button"
+                          onClick={() =>
+                            navigate(`/userPage/${element.owner._id}`)
+                          }
+                          className="flex cursor-pointer"
+                        >
                           <img
                             src={
                               element.owner.image !=
@@ -361,13 +368,13 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                             alt="Foto da pessoa"
                             className="w-10 h-10 rounded-full"
                           />
-                          <div className="flex flex-col">
-                            <h1 className="font-poppins font-medium">
+                          <div className="flex flex-col pl-2">
+                            <h1 className="font-poppins font-medium text-start">
                               {element.owner.name}
                             </h1>
                             <p>{element.comment}</p>
                           </div>
-                        </div>
+                        </button>
                         {user && user.name == element.owner.name && (
                           <button
                             className="cursor-pointer w-10 h-full flex justify-end"

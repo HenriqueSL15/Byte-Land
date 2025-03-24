@@ -6,15 +6,31 @@ import Publication from "./Publication.jsx";
 import { CiImageOn } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
 import { AuthContext } from "./AuthContext.jsx";
+import { useParams } from "react-router-dom";
 
 import { usePopUp } from "./PopUpContext.jsx";
 
 function UserPage() {
+  const { userId } = useParams();
   const { user, login } = useContext(AuthContext);
+  const [userInfo, setUserInfo] = useState(null);
+
+  async function getUserInfo() {
+    try {
+      const response = await axios.get(
+        `http://localhost:3000/users/${userId}/publications`
+      );
+      console.log(response.data);
+      if (response.status === 200) {
+        setUserInfo(response.data.user);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   const [userPosts, setUserPosts] = useState([]);
   const [editInfo, setEditInfo] = useState(false);
-
-  // console.log(user);
 
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
   const fileInputRef = React.useRef(null);
@@ -24,23 +40,13 @@ function UserPage() {
 
   async function getUserPosts() {
     try {
-      if (!user) {
+      if (!userInfo) {
         console.log("Usuário não está autenticado.");
         return;
       }
 
-      console.log("fazendo busca");
-
-      const response = await axios.post(
-        "http://localhost:3000/getUserPosts",
-        {
-          userId: user._id,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
+      const response = await axios.get(
+        `http://localhost:3000/users/${userId}/publications`
       );
 
       if (response.status === 200) {
@@ -71,10 +77,6 @@ function UserPage() {
     }
   };
 
-  useEffect(() => {
-    console.log(editedDescription);
-  }, [editedDescription]);
-
   // Função para alterar a imagem
   const handleImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -87,11 +89,10 @@ function UserPage() {
     const formData = new FormData();
     formData.append("image", editedImage);
     formData.append("description", editedDescription);
-    formData.append("userId", user._id);
 
     try {
       const response = await axios.put(
-        "http://localhost:3000/editUserPageInformation",
+        `http://localhost:3000/users/${userId}/userPage`,
         formData,
         {
           headers: {
@@ -101,7 +102,6 @@ function UserPage() {
       );
 
       if (response.status === 200) {
-        console.log("Informações do usuário atualizados com sucesso!");
         login(response.data.user);
         setEditedDescription("");
         setEditedImage(null);
@@ -113,18 +113,22 @@ function UserPage() {
   }
 
   useEffect(() => {
-    if (user) {
+    if (userInfo) {
       getUserPosts(); // Busca inicial
       const interval = setInterval(() => getUserPosts(), 1000); // Busca periódica
       return () => clearInterval(interval); // Limpa o intervalo ao desmontar
     }
-  }, [user]); // Executa quando `user` muda
+  }, [userInfo]); // Executa quando `user` muda
 
-  // useEffect(() => {
-  //   console.log(userPosts);
-  // }, [userPosts]);
+  useEffect(() => {
+    getUserInfo();
+  }, []);
 
-  if (!user) {
+  useEffect(() => {
+    getUserInfo();
+  }, [userId, editedDescription, editedImage]);
+
+  if (!userInfo) {
     return <p>Carregando...</p>; // Ou redirecione para a página de login
   }
 
@@ -138,19 +142,19 @@ function UserPage() {
           <div className="relative pb-14">
             <img
               src={
-                user.image !=
+                userInfo.image !=
                 "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                  ? `http://localhost:3000/${user.image}`
+                  ? `http://localhost:3000/${userInfo.image}`
                   : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
               }
-              className="absolute bg-white bottom-0 left-3 h-32 w-32 g-black rounded-full z-50 border-3 border-white shadow-md "
+              className="absolute bg-white bottom-0 left-3 h-32 w-32 g-black rounded-full z-48 border-3 border-white shadow-md "
               alt="Imagem do Usuário"
             />
             <img
               src={
-                user.userPageImage !=
+                userInfo.userPageImage !=
                 "https://www.solidbackgrounds.com/images/1920x1080/1920x1080-black-solid-color-background.jpg"
-                  ? `http://localhost:3000/${user.userPageImage}`
+                  ? `http://localhost:3000/${userInfo.userPageImage}`
                   : "https://www.solidbackgrounds.com/images/1920x1080/1920x1080-black-solid-color-background.jpg"
               }
               alt="Imagem do Perfil do Usuário"
@@ -159,22 +163,26 @@ function UserPage() {
             <div className="absolute left-36 top-[87%] min-w-[590px] max-w-[650px] flex justify-between items-center">
               <div className="flex flex-col w-[75%]">
                 <h1 className="font-funnel-sans text-2xl mb-1">
-                  {user ? user.name : "Não possui nome"}
+                  {userInfo ? userInfo.name : "Não possui nome"}
                 </h1>
-                {console.log(user.userPageDescription)}
+
                 <p className="font-funnel-sans text-lg text-[#979797]">
-                  {user ? user.userPageDescription : "Não possui descrição"}
+                  {userInfo
+                    ? userInfo.userPageDescription
+                    : "Não possui descrição"}
                 </p>
               </div>
-              <button
-                type="button"
-                className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
-                onClick={() => {
-                  setEditInfo(true);
-                }}
-              >
-                Edit Profile
-              </button>
+              {userInfo._id === user._id && (
+                <button
+                  type="button"
+                  className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
+                  onClick={() => {
+                    setEditInfo(true);
+                  }}
+                >
+                  Edit Profile
+                </button>
+              )}
             </div>
           </div>
           <div>

@@ -94,7 +94,7 @@ function LeftPart() {
                 <button
                   type="button"
                   className="text-2xl pt-3 cursor-pointer font-montserrat font-medium text-gray-600 border-b-2 border-gray-400 mt-auto mb-2 hover:border-gray-600 hover:text-gray-900 transition-all"
-                  onClick={() => navigate("/userPage")}
+                  onClick={() => navigate(`/userPage/${user._id}`)}
                 >
                   {user.name}
                 </button>

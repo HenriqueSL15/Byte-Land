@@ -14,7 +14,7 @@ function MiddlePart() {
 
   const fetchPublications = async () => {
     try {
-      const response = await axios.get("http://localhost:3000/getPublications");
+      const response = await axios.get("http://localhost:3000/publications");
       const data = await response.data;
 
       setPublications(data.reverse());
@@ -22,28 +22,6 @@ function MiddlePart() {
       console.error("Erro ao buscar publicações:", error);
     }
   };
-
-  //   async function getOwnerInformation(ownerName = owner) {
-  //   try {
-  //     const response = await axios.get(
-  //       "http://localhost:3000/getOwnerInformation",
-  //       {
-  //         owner: owner,
-  //       },
-  //       {
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //       }
-  //     );
-
-  //     if (response.status == 200) {
-  //       setOwnerInfo(response.data.owner);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // }
 
   useEffect(() => {
     const interval = setInterval(() => fetchPublications(), 1000);
