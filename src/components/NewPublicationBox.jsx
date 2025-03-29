@@ -51,9 +51,10 @@ function NewPublicationBox() {
           },
         }
       );
-
-      if (response.status === 200) {
-        console.log("Publicação enviada com sucesso!");
+      console.log("resposta do servidor:", response.status);
+      if (response.status === 201) {
+        setPopUpMessage("Publicação criada com sucesso!");
+        showPopUp();
         setTitle("");
         setDescription("");
         setImage(null);
@@ -169,30 +170,6 @@ function NewPublicationBox() {
           </button>
         </div>
       </div>
-      {show &&
-        (message == "Comentário adicionando com sucesso!" ||
-          message == "Comentário deletado com sucesso!") && (
-          <div className="fixed inset-0 flex justify-center items-center bg-gray-900/50 z-50">
-            <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130 ">
-              <p className="text-red-500 text-center font-poppins text-sm font-semibold">
-                {message}
-              </p>
-              <button
-                type="button"
-                className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
-                onClick={() => {
-                  setPopUpMessage("");
-                  closePopUp();
-                }}
-              >
-                {message == "Comentário adicionado com sucesso!" ||
-                message == "Comentário deletado com sucesso!"
-                  ? "Ok"
-                  : "Tentar novamente."}
-              </button>
-            </div>
-          </div>
-        )}
     </div>
   );
 }

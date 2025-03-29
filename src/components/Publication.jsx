@@ -10,7 +10,16 @@ import { useNavigate } from "react-router-dom";
 import { usePopUp } from "./PopUpContext.jsx";
 import axios from "axios";
 
-function Publication({ id, isOwner, owner, date, title, description, image }) {
+function Publication({
+  id,
+  isOwner,
+  owner,
+  date,
+  title,
+  description,
+  image,
+  key,
+}) {
   const navigate = useNavigate();
 
   // Contexto do usuário
@@ -48,15 +57,8 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
 
   // Função para deletar a publicação
   const handleDeletePublication = async (id, owner) => {
-    const publicationData = {
-      owner: owner,
-    };
-
     const response = await axios.delete(
-      `http://localhost:3000/publications/${id}`,
-      {
-        data: publicationData,
-      }
+      `http://localhost:3000/publications/${id}?owner=${owner._id}`
     );
 
     console.log("Resposta do servidor:", response.data);
@@ -77,8 +79,8 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     }
 
     const formData = new FormData();
-
-    formData.append("owner", owner);
+    console.log(editedDescription, editedTitle);
+    formData.append("owner", owner._id);
     formData.append("title", editedTitle);
     formData.append("description", editedDescription);
 
@@ -148,9 +150,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     try {
       const response = await axios.post(
         `http://localhost:3000/publications/${publicationId}/comments`,
-        {
-          data: commentData,
-        },
+        commentData,
         {
           headers: {
             "Content-Type": "application/json",
@@ -180,9 +180,32 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     if (!show) return null;
 
     return (
-      <div className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-50">
+      <div
+        className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-50"
+        id="comments-popup"
+      >
+        {message == "Comentário deletado com sucesso!" && (
+          <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130 ">
+            <p className="text-red-500 text-center font-poppins text-sm font-semibold">
+              {message}
+            </p>
+            <button
+              type="button"
+              className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
+              onClick={() => {
+                setPopUpMessage("");
+                closePopUp();
+              }}
+            >
+              Ok
+            </button>
+          </div>
+        )}
+
         {(message === "Publicação editada com sucesso!" ||
-          message === "Comentário adicionado com sucesso!") && (
+          message === "Comentário adicionado com sucesso!" ||
+          message === "Publicação criada com sucesso!" ||
+          message === "Preencha todos os campos!") && (
           <div className="bg-white border-2 p-10 rounded-lg">
             <p className="text-red-500 text-center font-poppins text-xl font-semibold">
               {message}
@@ -191,7 +214,10 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
               <button
                 type="button"
                 className="border-b-2 font-poppins text-sm hover:bg-red-200 px-5 pt-1 rounded-lg transition-all"
-                onClick={() => closePopUp()}
+                onClick={() => {
+                  setPopUpMessage("");
+                  closePopUp();
+                }}
               >
                 Confirmar
               </button>
@@ -220,9 +246,10 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                 type="button"
                 className="border-b-2 font-poppins text-sm hover:bg-red-200 px-5 pt-1 rounded-lg transition-all"
                 onClick={() => {
-                  handleEditPublication();
                   setPopUpMessage("");
                   closePopUp();
+                  console.log(editedTitle, editedDescription);
+                  handleEditPublication();
                 }}
               >
                 Confirmar
@@ -233,6 +260,15 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
       </div>
     );
   };
+
+  useEffect(() => {
+    console.log(editedTitle, editedDescription);
+  }, [editedTitle, editedDescription]);
+
+  useEffect(() => {
+    setEditedTitle(title);
+    setEditedDescription(description);
+  }, [title, description]); // ← Dependências das props
 
   return (
     <>
@@ -298,6 +334,8 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   className="font-bold py-2 px-4 rounded-full bg-white border-2 cursor-pointer hover:scale-103 hover:bg-black hover:text-white hover:border-2 transition-all"
                   onClick={() => {
                     setEdit(true);
+                    setEditedTitle(title); // ← Atualiza com valor atual
+                    setEditedDescription(description); // ← Atualiza com valor atual
                   }}
                 >
                   <FaPencilAlt className="w-5 h-5" />
@@ -409,7 +447,10 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
         </div>
       ) : (
         edit && (
-          <div className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-49">
+          <div
+            className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-49"
+            id="edit-post-modal"
+          >
             <div
               className={`min-h-[600px] rounded-lg my-5 bg-white flex flex-col w-6/10`}
             >
@@ -447,14 +488,14 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   type="text"
                   className="text-2xl mb-3 p-2 border-b-1 w-full font-montserrat"
                   placeholder="Título da publicação"
-                  defaultValue={title}
+                  value={editedTitle}
                   onChange={(e) => setEditedTitle(e.target.value)}
                 />
 
                 <textarea
                   className="text-base text-gray-800 w-full font-funnel-sans mb-5 overflow-y-scroll scrollbar-hide h-[200px] p-2 border-1 border-gray-500 rounded-lg"
                   placeholder="Conteúdo da publicação"
-                  defaultValue={description}
+                  value={editedDescription}
                   onChange={(e) => setEditedDescription(e.target.value)}
                 />
 
@@ -509,10 +550,11 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                     type="button"
                     className="font-bold py-2 px-4 rounded-full bg-white border-2 cursor-pointer hover:scale-103 hover:bg-black hover:text-white hover:border-2 transition-all"
                     onClick={() => {
-                      setPopUpMessage(
-                        "Deseja editar essa publicação? Essa ação não tem retorno."
-                      );
-                      showPopUp();
+                      handleEditPublication();
+                      // setPopUpMessage(
+                      //   "Deseja editar essa publicação? Essa ação não tem retorno."
+                      // );
+                      // showPopUp();
                     }}
                   >
                     <IoSend className="w-5 h-5" />
