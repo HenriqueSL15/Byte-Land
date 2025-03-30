@@ -5,6 +5,22 @@ import axios from "axios";
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
 
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+const createPublication = async (formData) => {
+  const response = await axios.post(
+    "http://localhost:3000/publications",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data", // Usado para enviar arquivos
+      },
+    }
+  );
+  console.log("resposta do servidor:", response.status);
+  return response.data;
+};
+
 function NewPublicationBox() {
   //Contexto de pop-up
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
@@ -15,6 +31,28 @@ function NewPublicationBox() {
 
   const titleLimit = 100;
   const descriptionLimit = 500;
+
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: createPublication,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["publications"] });
+
+      setPopUpMessage("Publicação criada com sucesso!");
+      showPopUp();
+      setTitle("");
+      setDescription("");
+      setImage(null);
+    },
+    onError: (error) => {
+      console.error("Erro ao enviar a publicação:", error);
+      setPopUpMessage(
+        error.response?.data?.message || "Erro ao criar publicação."
+      );
+      showPopUp();
+    },
+  });
 
   const { user } = useContext(AuthContext);
 
@@ -41,27 +79,7 @@ function NewPublicationBox() {
       formData.append("image", image ? image : null); // Adiciona o arquivo de imagem
     }
 
-    try {
-      const response = await axios.post(
-        "http://localhost:3000/publications",
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data", // Usado para enviar arquivos
-          },
-        }
-      );
-      console.log("resposta do servidor:", response.status);
-      if (response.status === 201) {
-        setPopUpMessage("Publicação criada com sucesso!");
-        showPopUp();
-        setTitle("");
-        setDescription("");
-        setImage(null);
-      }
-    } catch (error) {
-      console.error("Erro ao enviar a publicação:", error);
-    }
+    mutation.mutate(formData);
   };
 
   return (

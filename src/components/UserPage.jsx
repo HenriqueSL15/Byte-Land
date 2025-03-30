@@ -8,28 +8,37 @@ import { IoCloseOutline } from "react-icons/io5";
 import { AuthContext } from "./AuthContext.jsx";
 import { useParams } from "react-router-dom";
 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { usePopUp } from "./PopUpContext.jsx";
+
+async function getUserDataFn(userId) {
+  const response = await axios.get(
+    `http://localhost:3000/users/${userId}/publications`
+  );
+  console.log(response.data);
+  return response.data;
+}
+
+async function updateUserDataMutationFn({ userId, formData }) {
+  console.log(userId, formData);
+  const response = await axios.put(
+    `http://localhost:3000/users/${userId}/userPage`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  console.log(userId);
+  return response.data;
+}
 
 function UserPage() {
   const { userId } = useParams();
   const { user, login } = useContext(AuthContext);
-  const [userInfo, setUserInfo] = useState(null);
 
-  async function getUserInfo() {
-    try {
-      const response = await axios.get(
-        `http://localhost:3000/users/${userId}/publications`
-      );
-      console.log(response.data);
-      if (response.status === 200) {
-        setUserInfo(response.data.user);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const [userPosts, setUserPosts] = useState([]);
   const [editInfo, setEditInfo] = useState(false);
 
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
@@ -38,25 +47,32 @@ function UserPage() {
   const [editedImage, setEditedImage] = useState(null);
   const [editedDescription, setEditedDescription] = useState(null);
 
-  async function getUserPosts() {
-    try {
-      if (!userInfo) {
-        console.log("Usuário não está autenticado.");
-        return;
-      }
+  const queryClient = useQueryClient();
 
-      const response = await axios.get(
-        `http://localhost:3000/users/${userId}/publications`
-      );
+  const {
+    data: userData,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["userPageData", userId],
+    queryFn: () => getUserDataFn(userId),
+    enabled: !!userId,
+  });
 
-      if (response.status === 200) {
-        setUserPosts(response.data.posts);
-        console.log("Posts do usuário foram recebidos com sucesso!");
-      }
-    } catch (error) {
+  const updateUserMutation = useMutation({
+    mutationFn: updateUserDataMutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["userPageData", userId]);
+
+      login(userData.user);
+      setEditedDescription("");
+      setEditedImage(null);
+      setEditInfo(false);
+    },
+    onError: (error) => {
       console.log(error);
-    }
-  }
+    },
+  });
 
   function renderPopUps() {
     if (!show) return null;
@@ -90,45 +106,13 @@ function UserPage() {
     formData.append("image", editedImage);
     formData.append("description", editedDescription);
 
-    try {
-      const response = await axios.put(
-        `http://localhost:3000/users/${userId}/userPage`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
-
-      if (response.status === 200) {
-        login(response.data.user);
-        setEditedDescription("");
-        setEditedImage(null);
-        setEditInfo(false);
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    updateUserMutation.mutate({
+      userId: userData.user._id,
+      formData: formData,
+    });
   }
 
-  useEffect(() => {
-    if (userInfo) {
-      getUserPosts(); // Busca inicial
-      const interval = setInterval(() => getUserPosts(), 1000); // Busca periódica
-      return () => clearInterval(interval); // Limpa o intervalo ao desmontar
-    }
-  }, [userInfo]); // Executa quando `user` muda
-
-  useEffect(() => {
-    getUserInfo();
-  }, []);
-
-  useEffect(() => {
-    getUserInfo();
-  }, [userId, editedDescription, editedImage]);
-
-  if (!userInfo) {
+  if (!userData) {
     return <p>Carregando...</p>; // Ou redirecione para a página de login
   }
 
@@ -142,9 +126,9 @@ function UserPage() {
           <div className="relative pb-14">
             <img
               src={
-                userInfo.image !=
+                userData.user.image !=
                 "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                  ? `http://localhost:3000/${userInfo.image}`
+                  ? `http://localhost:3000/${userData.user.image}`
                   : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
               }
               className="absolute bg-white bottom-0 left-3 h-32 w-32 g-black rounded-full z-48 border-3 border-white shadow-md "
@@ -152,9 +136,9 @@ function UserPage() {
             />
             <img
               src={
-                userInfo.userPageImage !=
+                userData.user.userPageImage !=
                 "https://www.solidbackgrounds.com/images/1920x1080/1920x1080-black-solid-color-background.jpg"
-                  ? `http://localhost:3000/${userInfo.userPageImage}`
+                  ? `http://localhost:3000/${userData.user.userPageImage}`
                   : "https://www.solidbackgrounds.com/images/1920x1080/1920x1080-black-solid-color-background.jpg"
               }
               alt="Imagem do Perfil do Usuário"
@@ -163,16 +147,16 @@ function UserPage() {
             <div className="absolute left-36 top-[87%] min-w-[590px] max-w-[650px] flex justify-between items-center">
               <div className="flex flex-col w-[75%]">
                 <h1 className="font-funnel-sans text-2xl mb-1">
-                  {userInfo ? userInfo.name : "Não possui nome"}
+                  {userData.user ? userData.user.name : "Não possui nome"}
                 </h1>
 
                 <p className="font-funnel-sans text-lg text-[#979797]">
-                  {userInfo
-                    ? userInfo.userPageDescription
+                  {userData.user
+                    ? userData.user.userPageDescription
                     : "Não possui descrição"}
                 </p>
               </div>
-              {userInfo._id === user._id && (
+              {userData.user._id === user._id && (
                 <button
                   type="button"
                   className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
@@ -188,8 +172,9 @@ function UserPage() {
           <div>
             <h1 className="text-2xl font-normal ml-10">Posts</h1>
             <div>
-              {userPosts &&
-                userPosts.map((element, index) => {
+              {userData.posts &&
+                userData.posts.length > 0 &&
+                userData.posts.map((element, index) => {
                   return (
                     <Publication
                       id={element._id}

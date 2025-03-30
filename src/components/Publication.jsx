@@ -7,8 +7,65 @@ import { CiImageOn } from "react-icons/ci";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+
 import { usePopUp } from "./PopUpContext.jsx";
 import axios from "axios";
+
+const fetchComments = async (publicationId) => {
+  const { data } = await axios.get(
+    `http://localhost:3000/publications/${publicationId}/comments`
+  );
+  return data.comments.reverse();
+};
+
+const addCommentMutationFn = async (commentData) => {
+  const response = await axios.post(
+    `http://localhost:3000/publications/${commentData.id}/comments`,
+    commentData,
+    {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  return response.data;
+};
+
+const deleteCommentMutationFn = async (data) => {
+  console.log(data);
+  const response = await axios.delete(
+    `http://localhost:3000/publications/${data.publicationId}/comments/${data.commentId}`
+  );
+
+  return response.data;
+};
+
+const deletePublicationMutationFn = async (data) => {
+  console.log(data);
+  const response = await axios.delete(
+    `http://localhost:3000/publications/${data.id}?owner=${data.owner._id}`
+  );
+
+  return response.data;
+};
+
+const editPublicationMutationFn = async ({ publicationId, formData }) => {
+  console.log(publicationId);
+  console.log(formData);
+  const response = await axios.put(
+    `http://localhost:3000/publications/${publicationId}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+
+  return response.data;
+};
 
 function Publication({
   id,
@@ -24,14 +81,10 @@ function Publication({
 
   // Contexto do usuário
   const { user } = useContext(AuthContext);
-
   // Estado para mostrar ou não o botão de deletar publicação
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
 
   const newCommentLimit = 125;
-
-  // Estado para armazenar os comentários
-  const [comments, setComments] = useState([]);
 
   // Estado para armazenar novos comentários
   const [newComment, setNewComment] = useState("");
@@ -47,6 +100,78 @@ function Publication({
   // Estado para alterar a exibição do botão para um form
   const [edit, setEdit] = useState(false);
 
+  const queryClient = useQueryClient();
+
+  const {
+    data: comments,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["comments", id],
+    queryFn: () => fetchComments(id),
+    enabled: !!id,
+  });
+
+  const addCommentMutation = useMutation({
+    mutationFn: addCommentMutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", id] });
+
+      setNewComment("");
+      setPopUpMessage("Comentário adicionado com sucesso!");
+      showPopUp();
+    },
+    onError: (error) => {
+      console.error("Erro ao adicionar o comentário:", error);
+      setPopUpMessage("Erro ao adicionar comentário. Tente novamente.");
+      showPopUp();
+    },
+  });
+
+  const deleteCommentMutation = useMutation({
+    mutationFn: deleteCommentMutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["comments", id] });
+      setPopUpMessage("Comentário deletado com sucesso!");
+      showPopUp();
+    },
+    onError: (error) => {
+      console.error("Erro ao deletar o comentário:", error);
+      // setPopUpMessage("Erro ao deletar comentário. Tente novamente.");
+      // showPopUp();
+    },
+  });
+
+  const deletePublicationMutation = useMutation({
+    mutationFn: deletePublicationMutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["publications"] });
+      setPopUpMessage("Publicação deletada com sucesso!");
+      showPopUp();
+    },
+    onError: (error) => {
+      console.error("Erro ao deletar a publicação:", error);
+      // setPopUpMessage("Erro ao deletar publicação. Tente novamente.");
+      // showPopUp();
+    },
+  });
+
+  const editPublicationMutation = useMutation({
+    mutationFn: editPublicationMutationFn,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["publications"] });
+
+      setEdit(false);
+      setPopUpMessage("Publicação editada com sucesso!");
+      showPopUp();
+    },
+    onError: (error) => {
+      console.error("Erro ao editar a publicação:", error);
+      // setPopUpMessage("Erro ao editar publicação. Tente novamente.");
+      // showPopUp();
+    },
+  });
+
   // Função para alterar a imagem
   const handleImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -57,11 +182,12 @@ function Publication({
 
   // Função para deletar a publicação
   const handleDeletePublication = async (id, owner) => {
-    const response = await axios.delete(
-      `http://localhost:3000/publications/${id}?owner=${owner._id}`
-    );
+    const data = {
+      id: id,
+      owner: owner,
+    };
 
-    console.log("Resposta do servidor:", response.data);
+    deletePublicationMutation.mutate(data);
   };
 
   // Função para editar a publicação
@@ -79,7 +205,7 @@ function Publication({
     }
 
     const formData = new FormData();
-    console.log(editedDescription, editedTitle);
+
     formData.append("owner", owner._id);
     formData.append("title", editedTitle);
     formData.append("description", editedDescription);
@@ -90,53 +216,17 @@ function Publication({
       formData.append("image", null);
     }
 
-    try {
-      const response = await axios.put(
-        `http://localhost:3000/publications/${id}`,
-        formData,
-        { "Content-Type": "multipart/form-data" }
-      );
-
-      if (response.status == 200) {
-        setEdit(false);
-        setPopUpMessage("Publicação editada com sucesso!");
-        showPopUp();
-      }
-    } catch (error) {
-      setPopUpMessage(error.response.data.message);
-      showPopUp();
-    }
-  }
-
-  // Função para obter todos os comentários da publicação
-  async function getAllComments(publicationId) {
-    try {
-      const response = await axios.get(
-        `http://localhost:3000/publications/${publicationId}/comments`
-      );
-
-      if (response.status == 200) {
-        setComments(response.data.comments.reverse());
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    editPublicationMutation.mutate({ publicationId: id, formData: formData });
   }
 
   // Função para deletar um comentário
   async function deleteComment(publicationId, commentId) {
-    try {
-      const response = await axios.delete(
-        `http://localhost:3000/publications/${publicationId}/comments/${commentId}`
-      );
+    const data = {
+      publicationId: publicationId,
+      commentId: commentId,
+    };
 
-      if (response.status == 200) {
-        setPopUpMessage("Comentário deletado com sucesso!");
-        showPopUp();
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    deleteCommentMutation.mutate(data);
   }
 
   // Função para adicionar um comentário em uma publicação
@@ -147,31 +237,8 @@ function Publication({
       comment: comment,
     };
 
-    try {
-      const response = await axios.post(
-        `http://localhost:3000/publications/${publicationId}/comments`,
-        commentData,
-        {
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
-      if (response.status == 200) {
-        setNewComment("");
-        setPopUpMessage("Comentário adicionado com sucesso!");
-        showPopUp();
-      }
-    } catch (error) {
-      console.log(error);
-    }
+    addCommentMutation.mutate(commentData);
   }
-
-  useEffect(() => {
-    const interval = setInterval(() => getAllComments(id), 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   if (typeof image == "string") image.replaceAll("\\", "/");
 
@@ -205,7 +272,8 @@ function Publication({
         {(message === "Publicação editada com sucesso!" ||
           message === "Comentário adicionado com sucesso!" ||
           message === "Publicação criada com sucesso!" ||
-          message === "Preencha todos os campos!") && (
+          message === "Preencha todos os campos!" ||
+          message === "Publicação deletada com sucesso!") && (
           <div className="bg-white border-2 p-10 rounded-lg">
             <p className="text-red-500 text-center font-poppins text-xl font-semibold">
               {message}
@@ -260,10 +328,6 @@ function Publication({
       </div>
     );
   };
-
-  useEffect(() => {
-    console.log(editedTitle, editedDescription);
-  }, [editedTitle, editedDescription]);
 
   useEffect(() => {
     setEditedTitle(title);
@@ -399,7 +463,8 @@ function Publication({
                 )}
               </div>
 
-              {comments[0] != undefined &&
+              {comments &&
+                comments[0] != undefined &&
                 comments.map((element, index) => {
                   return (
                     <div key={index} className="p-2 rounded-sm mb-3">
@@ -507,7 +572,7 @@ function Publication({
                       editedImage instanceof Blob
                         ? URL.createObjectURL(editedImage)
                         : editedImage === "EXISTING_IMAGE"
-                        ? `http://localhost:3000/${owner.image}`
+                        ? `http://localhost:3000/${owner.userPageImage}`
                         : null
                     }
                     alt="Foto da publicação"

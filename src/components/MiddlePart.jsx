@@ -6,27 +6,32 @@ import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
 
+import { useQuery } from "@tanstack/react-query";
+
+const fetchPublications = async () => {
+  try {
+    const response = await axios.get("http://localhost:3000/publications");
+    const data = await response.data.reverse();
+
+    return data;
+  } catch (error) {
+    console.error("Erro ao buscar publicações:", error);
+  }
+};
+
 function MiddlePart() {
   const { user } = useContext(AuthContext);
-  const [publications, setPublications] = useState([]);
 
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
 
-  const fetchPublications = async () => {
-    try {
-      const response = await axios.get("http://localhost:3000/publications");
-      const data = await response.data;
-
-      setPublications(data.reverse());
-    } catch (error) {
-      console.error("Erro ao buscar publicações:", error);
-    }
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => fetchPublications(), 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const {
+    data: publications,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["publications"],
+    queryFn: fetchPublications,
+  });
 
   return (
     <div className="w-full border-2 h-screen overflow-y-scroll scrollbar-hide relative border-gray-200">
