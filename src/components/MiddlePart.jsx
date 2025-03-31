@@ -3,6 +3,8 @@ import NewPulicationBox from "./NewPublicationBox.jsx";
 import axios from "axios";
 import { useContext, useState, useEffect } from "react";
 
+import LoadingScreen from "./LoadingScreen.jsx";
+
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
 
@@ -32,6 +34,10 @@ function MiddlePart() {
     queryKey: ["publications"],
     queryFn: fetchPublications,
   });
+
+  if (isLoading) {
+    return <LoadingScreen />; // Ou redirecione para a página de login
+  }
 
   return (
     <div className="w-full border-2 h-screen overflow-y-scroll scrollbar-hide relative border-gray-200">

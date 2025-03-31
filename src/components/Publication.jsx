@@ -6,6 +6,7 @@ import { IoSend } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
 import { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import LoadingScreen from "./LoadingScreen.jsx";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -106,7 +107,7 @@ function Publication({
 
   const {
     data: comments,
-    isLoading,
+    isLoadingComments,
     error,
   } = useQuery({
     queryKey: ["comments", id],
@@ -342,6 +343,10 @@ function Publication({
     setEditedTitle(title);
     setEditedDescription(description);
   }, [title, description]); // ← Dependências das props
+
+  if (isLoadingComments) {
+    return <LoadingScreen />;
+  }
 
   return (
     <>

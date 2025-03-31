@@ -11,6 +11,7 @@ import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { usePopUp } from "./PopUpContext.jsx";
+import LoadingScreen from "./LoadingScreen.jsx";
 
 async function getUserDataFn(userId) {
   const response = await axios.get(
@@ -111,8 +112,8 @@ function UserPage() {
     });
   }
 
-  if (!userData) {
-    return <p>Carregando...</p>; // Ou redirecione para a página de login
+  if (isLoading) {
+    return <LoadingScreen />; // Ou redirecione para a página de login
   }
 
   return (
