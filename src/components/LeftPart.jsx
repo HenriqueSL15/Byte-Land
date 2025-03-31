@@ -7,8 +7,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useContext } from "react";
 
-import { Navigate } from "react-router-dom";
-
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
 
@@ -50,6 +48,7 @@ function LeftPart() {
   const { user, logout } = useContext(AuthContext);
 
   function handleLogout() {
+    navigate("/");
     logout();
   }
 

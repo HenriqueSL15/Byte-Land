@@ -4,7 +4,7 @@ import { FaPencilAlt } from "react-icons/fa";
 import { IoCloseOutline } from "react-icons/io5";
 import { IoSend } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -85,6 +85,8 @@ function Publication({
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
 
   const newCommentLimit = 125;
+
+  const inputRef = useRef(null);
 
   // Estado para armazenar novos comentários
   const [newComment, setNewComment] = useState("");
@@ -240,6 +242,13 @@ function Publication({
     addCommentMutation.mutate(commentData);
   }
 
+  const removeImage = () => {
+    setEditedImage(null);
+    if (inputRef.current) {
+      inputRef.current.value = "";
+    }
+  };
+
   if (typeof image == "string") image.replaceAll("\\", "/");
 
   // Função para renderizar os pop-ups
@@ -353,7 +362,7 @@ function Publication({
                     : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                 }
                 alt="Foto da pessoa"
-                className="w-12 h-12 rounded-full"
+                className={`w-12 h-12 rounded-full`}
               />
               <div className="flex flex-col">
                 <h1 className="text-2xl text-start font-poppins font-medium">
@@ -371,7 +380,9 @@ function Publication({
               </h2>
               <div className="flex justify-start">
                 <img
-                  className="max-h-2/4 mb-5 rounded-lg"
+                  className={`max-h-2/4 mb-5 rounded-lg ${
+                    image == null && "hidden"
+                  }  `}
                   src={
                     typeof image == "string"
                       ? "http://localhost:3000/" + image
@@ -516,6 +527,16 @@ function Publication({
             className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-49"
             id="edit-post-modal"
           >
+            {console.log(
+              id,
+              isOwner,
+              owner,
+              date,
+              title,
+              description,
+              image,
+              key
+            )}
             <div
               className={`min-h-[600px] rounded-lg my-5 bg-white flex flex-col w-6/10`}
             >
@@ -567,12 +588,12 @@ function Publication({
                 {/* Exibe a imagem selecionada */}
                 {editedImage && (
                   <img
-                    className="rounded-lg max-h-60 w-auto mx-auto object-contain"
+                    className={`rounded-lg max-h-60 w-auto mx-auto object-contain`}
                     src={
                       editedImage instanceof Blob
                         ? URL.createObjectURL(editedImage)
                         : editedImage === "EXISTING_IMAGE"
-                        ? `http://localhost:3000/${owner.userPageImage}`
+                        ? `http://localhost:3000/${image}`
                         : null
                     }
                     alt="Foto da publicação"
@@ -589,6 +610,7 @@ function Publication({
                         onChange={handleImageChange}
                         accept="image/*"
                         className="hidden"
+                        ref={inputRef}
                       />
                     </label>
                   )}
@@ -598,9 +620,7 @@ function Publication({
                     <button
                       type="button"
                       className="text-black h-1/2 font-bold border-2 w-1/4 py-2 px-4 rounded-full cursor-pointer"
-                      onClick={() => {
-                        setEditedImage(null);
-                      }}
+                      onClick={removeImage}
                     >
                       Delete Image
                     </button>

@@ -16,12 +16,11 @@ async function getUserDataFn(userId) {
   const response = await axios.get(
     `http://localhost:3000/users/${userId}/publications`
   );
-  console.log(response.data);
+
   return response.data;
 }
 
 async function updateUserDataMutationFn({ userId, formData }) {
-  console.log(userId, formData);
   const response = await axios.put(
     `http://localhost:3000/users/${userId}/userPage`,
     formData,
@@ -31,7 +30,7 @@ async function updateUserDataMutationFn({ userId, formData }) {
       },
     }
   );
-  console.log(userId);
+
   return response.data;
 }
 
@@ -178,7 +177,7 @@ function UserPage() {
                   return (
                     <Publication
                       id={element._id}
-                      isOwner={true}
+                      isOwner={userData.user._id === user._id}
                       key={element._id}
                       owner={element.owner}
                       title={element.title}

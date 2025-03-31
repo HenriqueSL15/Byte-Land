@@ -1,5 +1,5 @@
 import { CiImageOn } from "react-icons/ci";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useRef } from "react";
 import axios from "axios";
 
 import { AuthContext } from "./AuthContext.jsx";
@@ -24,6 +24,8 @@ const createPublication = async (formData) => {
 function NewPublicationBox() {
   //Contexto de pop-up
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
+
+  const inputRef = useRef(null);
 
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
@@ -60,7 +62,13 @@ function NewPublicationBox() {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
       setImage(file); // Armazena o arquivo, não a URL
-      console.log("Image:", file);
+    }
+  };
+
+  const removeImage = () => {
+    setImage(null);
+    if (inputRef.current) {
+      inputRef.current.value = "";
     }
   };
 
@@ -163,6 +171,7 @@ function NewPublicationBox() {
                 onChange={handleImageChange}
                 accept="image/*"
                 className="hidden"
+                ref={inputRef}
               />
             </label>
 
@@ -171,7 +180,7 @@ function NewPublicationBox() {
               <button
                 type="button"
                 className="text-black h-1/2 font-bold border-2 w-1/4 py-2 px-4 rounded-full cursor-pointer"
-                onClick={() => setImage(null)}
+                onClick={removeImage}
               >
                 Delete Image
               </button>
