@@ -8,6 +8,8 @@ import LoadingScreen from "./LoadingScreen.jsx";
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
 
+import PopUp from "./PopUp.jsx";
+
 import { useQuery } from "@tanstack/react-query";
 
 const fetchPublications = async () => {
@@ -24,7 +26,17 @@ const fetchPublications = async () => {
 function MiddlePart() {
   const { user } = useContext(AuthContext);
 
-  const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
+  const {
+    show,
+    showPopUp,
+    closePopUp,
+    message,
+    fn,
+    setPopUpFn,
+    setPopUpMessage,
+  } = usePopUp();
+
+  const [popUpInfo, setPopUpInfo] = useState(null);
 
   const {
     data: publications,
@@ -34,6 +46,29 @@ function MiddlePart() {
     queryKey: ["publications"],
     queryFn: fetchPublications,
   });
+
+  // Função para renderizar os pop-ups
+  const renderPopUps = () => {
+    if (!show) return null;
+
+    return (
+      <>
+        {message == "Comentário deletado com sucesso!" ||
+        message === "Publicação editada com sucesso!" ||
+        message === "Comentário adicionado com sucesso!" ||
+        message === "Publicação criada com sucesso!" ||
+        message === "Preencha todos os campos!" ||
+        message === "Publicação deletada com sucesso!" ? (
+          <PopUp message={message} type={"ok"} fn={null} />
+        ) : (
+          message ===
+            "Deseja editar essa publicação? Essa ação não tem retorno." && (
+            <PopUp message={message} type={"confirm/cancel"} fn={fn} />
+          )
+        )}
+      </>
+    );
+  };
 
   if (isLoading) {
     return <LoadingScreen />; // Ou redirecione para a página de login
@@ -59,6 +94,7 @@ function MiddlePart() {
             );
           })}
       </div>
+      {renderPopUps()}
     </div>
   );
 }

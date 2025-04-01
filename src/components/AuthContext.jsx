@@ -10,8 +10,6 @@ export const AuthProvider = ({ children }) => {
   // Verifica se há um usuário logado ao carregar a aplicação
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
-    console.log(storedUser === undefined);
-    console.log(storedUser === "undefined");
     if (storedUser !== "undefined") {
       setUser(JSON.parse(storedUser));
     }

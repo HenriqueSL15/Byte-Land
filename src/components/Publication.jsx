@@ -12,6 +12,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { usePopUp } from "./PopUpContext.jsx";
 import axios from "axios";
+import PopUp from "./PopUp.jsx";
 
 const fetchComments = async (publicationId) => {
   const { data } = await axios.get(
@@ -123,6 +124,12 @@ function Publication({
       setNewComment("");
       setPopUpMessage("Comentário adicionado com sucesso!");
       showPopUp();
+
+      addNotificationToOwner(
+        owner._id,
+        user._id,
+        "Adicionou um comentário na sua publicação de nome: " + title
+      );
     },
     onError: (error) => {
       console.error("Erro ao adicionar o comentário:", error);
@@ -158,6 +165,24 @@ function Publication({
       // showPopUp();
     },
   });
+
+  async function addNotificationToOwner(
+    publicationOwner,
+    notificationOwner,
+    message
+  ) {
+    const notificationData = {
+      message,
+      owner: notificationOwner,
+    };
+
+    const response = await axios.post(
+      `http://localhost:3000/users/${publicationOwner}/notifications`,
+      notificationData
+    );
+
+    return response.data;
+  }
 
   const editPublicationMutation = useMutation({
     mutationFn: editPublicationMutationFn,
@@ -252,93 +277,6 @@ function Publication({
 
   if (typeof image == "string") image.replaceAll("\\", "/");
 
-  // Função para renderizar os pop-ups
-  const renderPopups = () => {
-    if (!show) return null;
-
-    return (
-      <div
-        className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-50"
-        id="comments-popup"
-      >
-        {message == "Comentário deletado com sucesso!" && (
-          <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130 ">
-            <p className="text-red-500 text-center font-poppins text-sm font-semibold">
-              {message}
-            </p>
-            <button
-              type="button"
-              className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
-              onClick={() => {
-                setPopUpMessage("");
-                closePopUp();
-              }}
-            >
-              Ok
-            </button>
-          </div>
-        )}
-
-        {(message === "Publicação editada com sucesso!" ||
-          message === "Comentário adicionado com sucesso!" ||
-          message === "Publicação criada com sucesso!" ||
-          message === "Preencha todos os campos!" ||
-          message === "Publicação deletada com sucesso!") && (
-          <div className="bg-white border-2 p-10 rounded-lg">
-            <p className="text-red-500 text-center font-poppins text-xl font-semibold">
-              {message}
-            </p>
-            <div className="flex justify-center gap-2 scale-130 mt-10">
-              <button
-                type="button"
-                className="border-b-2 font-poppins text-sm hover:bg-red-200 px-5 pt-1 rounded-lg transition-all"
-                onClick={() => {
-                  setPopUpMessage("");
-                  closePopUp();
-                }}
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        )}
-
-        {message ===
-          "Deseja editar essa publicação? Essa ação não tem retorno." && (
-          <div className="bg-white border-2 p-10 rounded-lg">
-            <p className="text-red-500 text-center font-poppins text-xl font-semibold">
-              {message}
-            </p>
-            <div className="flex justify-center gap-2 scale-130 mt-10">
-              <button
-                type="button"
-                className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
-                onClick={() => {
-                  setPopUpMessage("");
-                  closePopUp();
-                }}
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                className="border-b-2 font-poppins text-sm hover:bg-red-200 px-5 pt-1 rounded-lg transition-all"
-                onClick={() => {
-                  setPopUpMessage("");
-                  closePopUp();
-                  console.log(editedTitle, editedDescription);
-                  handleEditPublication();
-                }}
-              >
-                Confirmar
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    );
-  };
-
   useEffect(() => {
     setEditedTitle(title);
     setEditedDescription(description);
@@ -380,12 +318,12 @@ function Publication({
             </button>
             <div className="m-5 overflow-y-auto scrollbar-hide">
               <h1 className="text-2xl mb-3 font-funnel-sans">{title}</h1>
-              <h2 className="text-base text-gray-800 mb-5 font-funnel-sans">
+              <h2 className="text-base text-gray-800 font-funnel-sans">
                 {description}
               </h2>
               <div className="flex justify-start">
                 <img
-                  className={`max-h-2/4 mb-5 rounded-lg ${
+                  className={`max-h-2/4 my-5 rounded-lg ${
                     image == null && "hidden"
                   }  `}
                   src={
@@ -532,16 +470,6 @@ function Publication({
             className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-49"
             id="edit-post-modal"
           >
-            {console.log(
-              id,
-              isOwner,
-              owner,
-              date,
-              title,
-              description,
-              image,
-              key
-            )}
             <div
               className={`min-h-[600px] rounded-lg my-5 bg-white flex flex-col w-6/10`}
             >
@@ -633,7 +561,7 @@ function Publication({
                 </div>
               </div>
 
-              {/* Botão de deletar publicação */}
+              {/* Botão de editar publicação */}
               {isOwner && (
                 <div className="flex justify-start px-5 items-center gap-2 mb-5 h-[20px]">
                   <button
@@ -657,7 +585,6 @@ function Publication({
       )}
 
       {/* Renderização dos pop-ups */}
-      {renderPopups()}
     </>
   );
 }
