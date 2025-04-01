@@ -5,14 +5,19 @@ import { FaUserFriends } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 
-import { useContext } from "react";
+import { useContext, useState } from "react";
 
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
+import Notifications from "./Notifications.jsx";
+import { useNotifications } from "./NotificationContext.jsx";
 
 function LeftPart() {
   //Contexto do pop up
   const { show } = usePopUp();
+
+  //Contexto das notificações
+  const { showNotifications, setShowNotifications } = useNotifications();
 
   //Navegação
   const navigate = useNavigate();
@@ -59,6 +64,8 @@ function LeftPart() {
       navigate("/");
     } else if (text === "Sair") {
       handleLogout();
+    } else if (text === "Notificações") {
+      setShowNotifications(true);
     }
   }
 
@@ -116,6 +123,8 @@ function LeftPart() {
           )}
         </div>
       </div>
+
+      {showNotifications && <Notifications />}
     </div>
   );
 }
