@@ -1,4 +1,5 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { queryClient } from "../main.jsx";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthContext } from "./AuthContext.jsx";
@@ -6,31 +7,11 @@ import LoadingScreen from "./LoadingScreen.jsx";
 import { IoCloseOutline } from "react-icons/io5";
 import { useNotifications } from "./NotificationContext.jsx";
 
-const fetchNotifications = async (userId) => {
-  const { data } = await axios.get(
-    `http://localhost:3000/users/${userId}/notifications`
-  );
-
-  return data.notifications.reverse();
-};
-
 function Notifications() {
   const { user } = useContext(AuthContext);
   const { setShowNotifications } = useNotifications();
 
-  const {
-    data: notifications,
-    isLoading,
-    error,
-  } = useQuery({
-    queryKey: ["notifications", user._id],
-    queryFn: () => fetchNotifications(user._id),
-    enabled: !!user,
-  });
-
-  if (isLoading) {
-    return <LoadingScreen />;
-  }
+  const notifications = queryClient.getQueryData(["notifications", user._id]);
 
   return (
     <div className="absolute w-full h-screen bg-black/40 z-50 flex items-center justify-center top-0 left-0">

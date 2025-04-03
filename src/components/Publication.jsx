@@ -69,16 +69,7 @@ const editPublicationMutationFn = async ({ publicationId, formData }) => {
   return response.data;
 };
 
-function Publication({
-  id,
-  isOwner,
-  owner,
-  date,
-  title,
-  description,
-  image,
-  key,
-}) {
+function Publication({ id, isOwner, owner, date, title, description, image }) {
   const navigate = useNavigate();
 
   // Contexto do usuário
@@ -417,8 +408,7 @@ function Publication({
                 )}
               </div>
 
-              {comments &&
-                comments[0] != undefined &&
+              {Array.isArray(comments) &&
                 comments.map((element, index) => {
                   return (
                     <div key={index} className="p-2 rounded-sm mb-3">
@@ -426,14 +416,15 @@ function Publication({
                         <button
                           type="button"
                           onClick={() =>
-                            navigate(`/userPage/${element.owner._id}`)
-                          }
+                            navigate(`/userPage/${element.owner?._id}`)
+                          } // Check if owner exists
                           className="flex cursor-pointer"
                         >
                           <img
                             src={
-                              element.owner.image !=
-                              "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                              element.owner &&
+                              element.owner.image !==
+                                "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                                 ? `http://localhost:3000/${element.owner.image}`
                                 : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                             }
@@ -442,21 +433,25 @@ function Publication({
                           />
                           <div className="flex flex-col pl-2">
                             <h1 className="font-poppins font-medium text-start">
-                              {element.owner.name}
+                              {element.owner
+                                ? element.owner.name
+                                : "Unknown User"}
                             </h1>
                             <p className="text-start w-[450px] break-words">
                               {element.comment}
                             </p>
                           </div>
                         </button>
-                        {user && user.name == element.owner.name && (
-                          <button
-                            className="cursor-pointer w-10 h-full flex justify-end"
-                            onClick={() => deleteComment(id, element._id)}
-                          >
-                            <IoCloseOutline className="w-10 h-10" />
-                          </button>
-                        )}
+                        {user &&
+                          element.owner &&
+                          user.name == element.owner.name && (
+                            <button
+                              className="cursor-pointer w-10 h-full flex justify-end"
+                              onClick={() => deleteComment(id, element._id)}
+                            >
+                              <IoCloseOutline className="w-10 h-10" />
+                            </button>
+                          )}
                       </div>
                     </div>
                   );

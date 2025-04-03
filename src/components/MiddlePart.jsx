@@ -23,6 +23,14 @@ const fetchPublications = async () => {
   }
 };
 
+const fetchNotifications = async (userId) => {
+  const { data } = await axios.get(
+    `http://localhost:3000/users/${userId}/notifications`
+  );
+
+  return data.notifications.reverse();
+};
+
 function MiddlePart() {
   const { user } = useContext(AuthContext);
 
@@ -40,11 +48,22 @@ function MiddlePart() {
 
   const {
     data: publications,
-    isLoading,
-    error,
+    isLoadingPublications,
+    errorPublications,
   } = useQuery({
     queryKey: ["publications"],
     queryFn: fetchPublications,
+    enabled: !!user,
+  });
+
+  const {
+    data: notifications,
+    isLoadingNotifications,
+    errorNotifications,
+  } = useQuery({
+    queryKey: ["notifications", user?._id],
+    queryFn: () => fetchNotifications(user._id),
+    enabled: !!user?._id,
   });
 
   // Função para renderizar os pop-ups
@@ -70,7 +89,7 @@ function MiddlePart() {
     );
   };
 
-  if (isLoading) {
+  if (isLoadingPublications) {
     return <LoadingScreen />; // Ou redirecione para a página de login
   }
 
@@ -84,12 +103,12 @@ function MiddlePart() {
               <Publication
                 id={element._id}
                 isOwner={user ? user.name === element.owner.name : false}
-                key={index}
                 owner={element.owner}
                 title={element.title}
                 description={element.description}
                 image={element.image}
                 date={element.createdAt}
+                key={element._id}
               />
             );
           })}
