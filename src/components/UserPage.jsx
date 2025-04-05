@@ -8,6 +8,8 @@ import { IoCloseOutline } from "react-icons/io5";
 import { AuthContext } from "./AuthContext.jsx";
 import { useParams } from "react-router-dom";
 
+import { useNavigate } from "react-router-dom";
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { usePopUp } from "./PopUpContext.jsx";
@@ -37,7 +39,11 @@ async function updateUserDataMutationFn({ userId, formData }) {
 
 function UserPage() {
   const { userId } = useParams();
-  const { user, login } = useContext(AuthContext);
+  const { user, login, isLoading: isLoadingUser } = useContext(AuthContext);
+
+  const navigate = useNavigate();
+
+  if (!user && !isLoadingUser) navigate("/login");
 
   const [editInfo, setEditInfo] = useState(false);
 

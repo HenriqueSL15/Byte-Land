@@ -12,6 +12,8 @@ import PopUp from "./PopUp.jsx";
 
 import { useQuery } from "@tanstack/react-query";
 
+import { useNavigate } from "react-router-dom";
+
 const fetchPublications = async () => {
   try {
     const response = await axios.get("http://localhost:3000/publications");
@@ -33,6 +35,7 @@ const fetchNotifications = async (userId) => {
 
 function MiddlePart() {
   const { user } = useContext(AuthContext);
+  const navigate = useNavigate();
 
   const {
     show,
@@ -97,6 +100,7 @@ function MiddlePart() {
     <div className="w-full border-2 h-screen overflow-y-scroll scrollbar-hide relative border-gray-200">
       <div>
         {user && <NewPulicationBox />}
+
         {publications &&
           publications.map((element, index) => {
             return (

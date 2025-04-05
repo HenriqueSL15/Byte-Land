@@ -2,8 +2,16 @@ import LeftMenu from "./LeftMenu.jsx";
 import { useState } from "react";
 import UserConfigPage from "./UserConfigPage.jsx";
 import UserSecurityPage from "./UserSecurityPage.jsx";
+import { useContext } from "react";
+import { AuthContext } from "./AuthContext.jsx";
+import { useNavigate } from "react-router-dom";
 
 function ConfigurationsPage() {
+  const { user, isLoading } = useContext(AuthContext);
+  const navigate = useNavigate();
+
+  if (!user && !isLoading) navigate("/login");
+
   const [option, setOption] = useState("Informações do Usuário");
 
   const options = [
