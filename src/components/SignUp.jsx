@@ -126,8 +126,8 @@ function SignUp() {
         response.status == 200 &&
         response.data.message == "Usuário criado com sucesso!"
       ) {
-        login(response.data.user);
-        navigate("/");
+        // login(response.data.user);
+        navigate("/login");
         console.log("Sign Up realizado com sucesso!");
       } else if (response.status == 200) {
         setPopUpMessage(response.data.message);

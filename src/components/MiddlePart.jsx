@@ -92,7 +92,7 @@ function MiddlePart() {
     );
   };
 
-  if (isLoadingPublications) {
+  if (isLoadingPublications || isLoadingNotifications) {
     return <LoadingScreen />; // Ou redirecione para a página de login
   }
 
@@ -103,6 +103,7 @@ function MiddlePart() {
 
         {publications &&
           publications.map((element, index) => {
+            console.log(element);
             return (
               <Publication
                 id={element._id}

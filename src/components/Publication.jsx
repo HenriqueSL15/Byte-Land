@@ -115,12 +115,13 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
       setNewComment("");
       setPopUpMessage("Comentário adicionado com sucesso!");
       showPopUp();
-
-      addNotificationToOwner(
-        owner._id,
-        user._id,
-        "Adicionou um comentário na sua publicação de nome: " + title
-      );
+      if (owner._id !== user._id) {
+        addNotificationToOwner(
+          owner._id,
+          user._id,
+          "Adicionou um comentário na sua publicação de nome: " + title
+        );
+      }
     },
     onError: (error) => {
       console.error("Erro ao adicionar o comentário:", error);
