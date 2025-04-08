@@ -14,13 +14,15 @@ import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
 import Notifications from "./Notifications.jsx";
+import Friends from "./Friends.jsx";
 import { useNotifications } from "./NotificationContext.jsx";
+import { useFriends } from "./FriendsContext.jsx";
 
 async function fetchNotifications(userId) {
   const { data } = await axios.get(
     `http://localhost:3000/users/${userId}/notifications`
   );
-  console.log(data.notifications);
+
   return data.notifications.reverse();
 }
 
@@ -33,6 +35,7 @@ function LeftPart() {
 
   //Contexto das notificações
   const { showNotifications, setShowNotifications } = useNotifications();
+  const { showFriends, setShowFriends } = useFriends();
 
   const {
     data: notifications,
@@ -86,12 +89,16 @@ function LeftPart() {
   function handleClick(text) {
     if (text === "Configurações") {
       navigate("/configs");
-    } else if (text === "Home") {
+    }
+
+    if (text === "Home") {
       navigate("/");
-    } else if (text === "Sair") {
-      handleLogout();
     } else if (text === "Notificações") {
       setShowNotifications(true);
+    } else if (text === "Amigos") {
+      setShowFriends(true);
+    } else if (text === "Sair") {
+      handleLogout();
     }
   }
 
@@ -158,6 +165,7 @@ function LeftPart() {
       </div>
 
       {showNotifications && <Notifications />}
+      {showFriends && <Friends />}
     </div>
   );
 }

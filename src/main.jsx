@@ -6,6 +6,7 @@ import { AuthProvider } from "./components/AuthContext.jsx";
 import { PopUpProvider } from "./components/PopUpContext.jsx";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { NotificationProvider } from "./components/NotificationContext.jsx";
+import { FriendsProvider } from "./components/FriendsContext.jsx";
 
 export const queryClient = new QueryClient();
 
@@ -15,7 +16,9 @@ createRoot(document.getElementById("root")).render(
       <NotificationProvider>
         <PopUpProvider>
           <AuthProvider>
-            <App />
+            <FriendsProvider>
+              <App />
+            </FriendsProvider>
           </AuthProvider>
         </PopUpProvider>
       </NotificationProvider>
