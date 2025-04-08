@@ -173,6 +173,10 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
       notificationData
     );
 
+    queryClient.invalidateQueries({
+      queryKey: ["notifications", publicationOwner],
+    });
+
     return response.data;
   }
 

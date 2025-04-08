@@ -1,25 +1,39 @@
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { queryClient } from "../main.jsx";
 import axios from "axios";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext.jsx";
 import LoadingScreen from "./LoadingScreen.jsx";
 import { IoCloseOutline } from "react-icons/io5";
 import { useNotifications } from "./NotificationContext.jsx";
+import { useNavigate } from "react-router-dom";
+
+async function fetchNotifications(userId) {
+  const { data } = await axios.get(
+    `http://localhost:3000/users/${userId}/notifications`
+  );
+  return data.notifications.reverse();
+}
 
 function Notifications() {
   const { user } = useContext(AuthContext);
   const { setShowNotifications } = useNotifications();
 
-  const notifications = queryClient.getQueryData(["notifications", user._id]);
+  const navigate = useNavigate();
 
-  const newNotifications = notifications?.filter(
-    (notification) => notification.read === false
-  );
-
-  const readNotifications = notifications?.filter(
-    (notification) => notification.read === true
-  );
+  // const notifications = queryClient.getQueryData(["notifications", user._id]);
+  const {
+    data: notifications,
+    refetch: fetchNotifications,
+    isLoadingNotifications,
+    isError,
+  } = useQuery({
+    queryKey: ["notifications", user._id],
+    queryFn: () => fetchNotifications(user._id),
+    enabled: false,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+  });
 
   async function markAsReadMutationFn() {
     try {
@@ -34,6 +48,11 @@ function Notifications() {
     }
   }
 
+  const handleNotificationClick = (notificationOwnerId) => {
+    setShowNotifications(false);
+    navigate(`/userPage/${notificationOwnerId}`);
+  };
+
   const markAsReadMutation = useMutation({
     mutationFn: markAsReadMutationFn,
     onSuccess: () => {
@@ -42,11 +61,9 @@ function Notifications() {
   });
 
   useEffect(() => {
-    return () => {
-      if (newNotifications.length > 0) {
-        markAsReadMutation.mutate();
-      }
-    };
+    if (user) {
+      fetchNotifications(user._id);
+    }
   }, []);
 
   return (
@@ -58,77 +75,94 @@ function Notifications() {
             className="w-full h-full hover:scale-110 transform transition-all"
             onClick={() => {
               setShowNotifications(false);
+              markAsReadMutation.mutate();
             }}
           />
         </button>
 
-        <div className="flex flex-col  mt-3 px-3 overflow-y-auto">
-          <h2 className="text-xl mt-3 mb-1">Novas notificações</h2>
-          {notifications &&
-            newNotifications &&
-            newNotifications.map((notification, index) => {
-              return (
-                <div
-                  key={index}
-                  className="w-full min-h-16 flex flex-col gap-3"
-                >
-                  <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
-                  <div className="flex bg-white">
-                    <img
-                      src={
-                        notification.owner.image ==
-                        "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                          ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                          : `http://localhost:3000/${notification.owner.image}`
-                      }
-                      alt="Foto do dono da notificação"
-                      className="w-16 h-16 rounded-full"
-                    />
-                    <div className="flex flex-col gap-1 mb-5">
-                      <h1 className="text-start ml-4 text-lg font-semibold font-montserrat">
-                        {notification.owner.name}
-                      </h1>
-                      <p className="text-start ml-4 text-lg">
-                        {notification.message}
-                      </p>
+        <div className="flex flex-col px-3 overflow-y-auto">
+          <div className="flex flex-col gap-2">
+            <h2 className="text-xl mt-3">Novas notificações</h2>
+
+            {notifications &&
+              notifications
+                .filter((notification) => !notification.read)
+                .map((notification, index) => {
+                  return (
+                    <div key={index} className="w-full min-h-16 flex flex-col">
+                      <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
+                      <div className="flex bg-white my-3">
+                        <button
+                          onClick={() =>
+                            handleNotificationClick(notification.owner._id)
+                          }
+                          className="cursor-pointer w-20 h-full hover:scale-105 transform transition-all"
+                        >
+                          <img
+                            src={
+                              notification.owner.image ==
+                              "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                                ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                                : `http://localhost:3000/${notification.owner.image}`
+                            }
+                            alt="Foto do dono da notificação"
+                            className="w-16 h-16 rounded-full"
+                          />
+                        </button>
+                        <div className="flex flex-col gap-1">
+                          <h1 className="text-start ml-4 text-lg font-semibold font-montserrat">
+                            {notification.owner.name}
+                          </h1>
+                          <p className="text-start ml-4 text-lg">
+                            {notification.message}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
-          <h2 className="text-xl mt-3 mb-1">Notificações já lidas</h2>
-          {notifications &&
-            readNotifications &&
-            readNotifications.map((notification, index) => {
-              return (
-                <div
-                  key={index}
-                  className="w-full min-h-16 flex flex-col gap-3"
-                >
-                  <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
-                  <div className="flex bg-white-500">
-                    <img
-                      src={
-                        notification.owner.image ==
-                        "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                          ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                          : `http://localhost:3000/${notification.owner.image}`
-                      }
-                      alt="Foto do dono da notificação"
-                      className="w-16 h-16 rounded-full"
-                    />
-                    <div className="flex flex-col gap-1 mb-5">
-                      <h1 className="text-start ml-4 text-lg font-semibold font-montserrat">
-                        {notification.owner.name}
-                      </h1>
-                      <p className="text-start ml-4 text-lg">
-                        {notification.message}
-                      </p>
+                  );
+                })}
+          </div>
+          <div className="flex flex-col gap-2 mt-10">
+            <h2 className="text-xl mt-3">Notificações já lidas</h2>
+
+            {notifications &&
+              notifications
+                .filter((notification) => notification.read)
+                .map((notification, index) => {
+                  return (
+                    <div key={index} className="w-full min-h-16 flex flex-col">
+                      <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
+                      <div className="flex bg-white my-3">
+                        <button
+                          onClick={() =>
+                            handleNotificationClick(notification.owner._id)
+                          }
+                          className="cursor-pointer w-20 h-full hover:scale-105 transform transition-all"
+                        >
+                          <img
+                            src={
+                              notification.owner.image ==
+                              "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                                ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                                : `http://localhost:3000/${notification.owner.image}`
+                            }
+                            alt="Foto do dono da notificação"
+                            className="w-16 h-16 rounded-full"
+                          />
+                        </button>
+                        <div className="flex flex-col gap-1">
+                          <h1 className="text-start ml-4 text-lg font-semibold font-montserrat">
+                            {notification.owner.name}
+                          </h1>
+                          <p className="text-start ml-4 text-lg">
+                            {notification.message}
+                          </p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  );
+                })}
+          </div>
         </div>
       </div>
     </div>

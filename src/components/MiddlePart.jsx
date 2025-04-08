@@ -103,7 +103,6 @@ function MiddlePart() {
 
         {publications &&
           publications.map((element, index) => {
-            console.log(element);
             return (
               <Publication
                 id={element._id}

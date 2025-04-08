@@ -5,21 +5,49 @@ import { FaUserFriends } from "react-icons/fa";
 import { IoMdSettings } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
 
-import { useContext, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { queryClient } from "../main.jsx";
+
+import { useContext, useState, useEffect } from "react";
 
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
 import Notifications from "./Notifications.jsx";
 import { useNotifications } from "./NotificationContext.jsx";
 
+async function fetchNotifications(userId) {
+  const { data } = await axios.get(
+    `http://localhost:3000/users/${userId}/notifications`
+  );
+  console.log(data.notifications);
+  return data.notifications.reverse();
+}
+
 function LeftPart() {
+  //Contexto do usuário
+  const { user, logout } = useContext(AuthContext);
+
   //Contexto do pop up
   const { show } = usePopUp();
 
   //Contexto das notificações
   const { showNotifications, setShowNotifications } = useNotifications();
 
-  //Navegação
+  const {
+    data: notifications,
+    isLoadingNotifications,
+    isError,
+  } = useQuery({
+    queryKey: ["notifications", user?._id],
+    queryFn: () => fetchNotifications(user?._id),
+    enabled: !!user,
+  });
+
+  const newNotifications = notifications?.filter(
+    (notification) => notification.read === false
+  );
+
   const navigate = useNavigate();
 
   const buttons = [
@@ -50,8 +78,6 @@ function LeftPart() {
     },
   ];
 
-  const { user, logout } = useContext(AuthContext);
-
   function handleLogout() {
     navigate("/");
     logout();
@@ -80,6 +106,13 @@ function LeftPart() {
         >
           {button.icon}
           <p className="text-2xl font-montserrat font-medium">{button.text}</p>
+          {button.id === 2 && notifications && newNotifications.length > 0 && (
+            <div className="flex items-center justify-center w-8 h-8 bg-red-500 rounded-full">
+              <p className="text-white text-lg font-montserrat font-bold">
+                {newNotifications.length}
+              </p>
+            </div>
+          )}
         </button>
       ))}
       <div className="flex flex-col mt-auto">
