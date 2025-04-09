@@ -99,6 +99,24 @@ function UserPage() {
     }
   };
 
+  async function addNotificationToOwner(userId, notificationOwner, message) {
+    const notificationData = {
+      message,
+      owner: notificationOwner,
+    };
+
+    const response = await axios.post(
+      `http://localhost:3000/users/${userId}/notifications`,
+      notificationData
+    );
+
+    queryClient.invalidateQueries({
+      queryKey: ["notifications", userId],
+    });
+
+    return response.data;
+  }
+
   // Função para alterar a imagem
   const handleImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
@@ -117,6 +135,24 @@ function UserPage() {
       formData: formData,
     });
   }
+
+  const handleSendFriendRequest = async (userId, friendId) => {
+    try {
+      const response = await axios.post(
+        `http://localhost:3000/users/${userId}/friends/${friendId}`
+      );
+
+      addNotificationToOwner(
+        friendId,
+        userId,
+        "Enviou uma solicitação de amizade para você!"
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   if (isLoading) {
     return <LoadingScreen />; // Ou redirecione para a página de login
@@ -162,7 +198,7 @@ function UserPage() {
                     : "Não possui descrição"}
                 </p>
               </div>
-              {userData.user._id === user._id && (
+              {userData.user._id === user._id ? (
                 <button
                   type="button"
                   className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
@@ -170,7 +206,15 @@ function UserPage() {
                     setEditInfo(true);
                   }}
                 >
-                  Edit Profile
+                  Editar Perfil
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
+                  onClick={() => handleSendFriendRequest(user._id, userId)}
+                >
+                  Adicionar Amigo
                 </button>
               )}
             </div>
