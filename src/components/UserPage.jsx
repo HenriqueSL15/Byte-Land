@@ -15,6 +15,20 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { usePopUp } from "./PopUpContext.jsx";
 import LoadingScreen from "./LoadingScreen.jsx";
 
+const fetchFriendsFn = async (userId) => {
+  try {
+    const response = await axios.get(
+      `http://localhost:3000/users/${userId}/friends`
+    );
+
+    console.log(response.data.friends);
+
+    return response.data.friends;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 async function getUserDataFn(userId) {
   const response = await axios.get(
     `http://localhost:3000/users/${userId}/publications`
@@ -49,6 +63,8 @@ function UserPage() {
 
   const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
   const fileInputRef = React.useRef(null);
+
+  const [isFriend, setIsFriend] = useState(false);
 
   const [editedImage, setEditedImage] = useState(null);
   const [editedDescription, setEditedDescription] = useState(null);
@@ -154,8 +170,47 @@ function UserPage() {
     }
   };
 
+  const handleRemoveFriend = async (userId, friendId) => {
+    try {
+      const response = await axios.patch(
+        `http://localhost:3000/users/${userId}/friends/${friendId}`,
+        {
+          status: "rejected",
+        }
+      );
+
+      addNotificationToOwner(friendId, userId, "Desfez sua amizade");
+      if (response.status === 200) {
+        queryClient.invalidateQueries(["allFriends", user._id]);
+      }
+      return response.data;
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const {
+    data: allFriends,
+    isLoadingFriends,
+    isError,
+  } = useQuery({
+    queryKey: ["allFriends", user?._id],
+    queryFn: () => fetchFriendsFn(user._id),
+    enabled: !!user,
+  });
+
+  useEffect(() => {
+    if (!isLoadingFriends && allFriends) {
+      setIsFriend(
+        allFriends.some(
+          (friend) => friend.user._id === userId && friend.status === "accepted"
+        )
+      );
+    }
+  }, [isLoadingFriends, allFriends, userId]);
+
   if (isLoading) {
-    return <LoadingScreen />; // Ou redirecione para a página de login
+    return <LoadingScreen />;
   }
 
   return (
@@ -208,13 +263,21 @@ function UserPage() {
                 >
                   Editar Perfil
                 </button>
-              ) : (
+              ) : !isFriend ? (
                 <button
                   type="button"
                   className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
                   onClick={() => handleSendFriendRequest(user._id, userId)}
                 >
                   Adicionar Amigo
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
+                  onClick={() => handleRemoveFriend(user._id, userId)}
+                >
+                  Desfazer Amizade
                 </button>
               )}
             </div>

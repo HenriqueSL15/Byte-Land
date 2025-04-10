@@ -5,6 +5,7 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext.jsx";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const fetchFriendsFn = async (userId) => {
   try {
@@ -25,6 +26,25 @@ function Friends() {
   const { user } = useContext(AuthContext);
   const [pendingFriendRequests, setPendingFriendRequests] = useState([]);
   const [friends, setFriends] = useState([]);
+  const navigate = useNavigate();
+
+  async function addNotificationToOwner(userId, notificationOwner, message) {
+    const notificationData = {
+      message,
+      owner: notificationOwner,
+    };
+
+    const response = await axios.post(
+      `http://localhost:3000/users/${userId}/notifications`,
+      notificationData
+    );
+
+    queryClient.invalidateQueries({
+      queryKey: ["notifications", userId],
+    });
+
+    return response.data;
+  }
 
   const {
     data: allFriends,
@@ -67,6 +87,16 @@ function Friends() {
           status: status,
         }
       );
+
+      if (status === "accepted") {
+        addNotificationToOwner(
+          friendId,
+          userId,
+          "Aceitou seu pedido de amizade"
+        );
+      } else if (status === "rejected") {
+        addNotificationToOwner(friendId, userId, "Negou seu pedido de amizade");
+      }
 
       if (response.status === 200) {
         queryClient.invalidateQueries(["allFriends", user._id]);
@@ -152,7 +182,7 @@ function Friends() {
                   <div key={index} className="w-full min-h-16 flex flex-col">
                     <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
                     <div className="flex bg-white my-3 relative">
-                      <button className="cursor-pointer w-20 h-full hover:scale-105 transform transition-all">
+                      <button className="cursor-pointer w-20 h-full hover:scale-103 transform transition-all overflow-visible relative z-10">
                         <img
                           src={
                             friend.user.image ==
@@ -162,13 +192,16 @@ function Friends() {
                           }
                           alt="Foto do dono da notificação"
                           className="w-15 h-15 rounded-full"
+                          onClick={() =>
+                            navigate(`/userPage/${friend.user._id}`)
+                          }
                         />
                       </button>
                       <div className="flex flex-col gap-1">
                         <h1 className="text-start text-lg font-semibold font-montserrat">
                           {friend.user.name}
                         </h1>
-                        <p className="text-start text-lg">
+                        <p className="text-start text-lg font-funnel-sans">
                           {friend.user.userPageDescription}
                         </p>
                       </div>
