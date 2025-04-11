@@ -2,6 +2,7 @@ import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "./AuthContext.jsx";
 import axios from "axios";
 import PasswordValidator from "password-validator";
+import { toast } from "sonner";
 
 function UserSecurityPage() {
   const { user } = useContext(AuthContext);
@@ -50,6 +51,11 @@ function UserSecurityPage() {
   }, [newPassword]);
 
   async function handleSubmit(userId, newPassword, oldPassword) {
+    if (errors.length > 0) {
+      toast.error("Senha Inválida!");
+      return;
+    }
+
     try {
       const response = await axios.put(
         `http://localhost:3000/users/${userId}/password`,
@@ -66,11 +72,13 @@ function UserSecurityPage() {
 
       if (response.status == 200) {
         console.log("Senha alterada com sucesso!", response.data);
+        toast.success("Senha alterada com sucesso!");
         setOldPassword("");
         setNewPassword("");
       }
     } catch (error) {
       console.log(error);
+      toast.error("Senha incorreta!");
     }
   }
 
@@ -137,13 +145,16 @@ function UserSecurityPage() {
             <div className="flex justify-center items-center">
               <button
                 type="button"
-                onClick={() => handleSubmit(user._id, newPassword, oldPassword)}
-                className={`bg-white transform transition-all border-2 border-black p-10 font-bold py-2 px-4 rounded ${
+                onClick={() => {
+                  errors.length > 0
+                    ? toast.error("Senha Inválida!")
+                    : handleSubmit(user._id, newPassword, oldPassword);
+                }}
+                className={`transform transition-all border-2 border-black p-10 font-bold py-2 px-4 rounded ${
                   isInitial || errors.length > 0
-                    ? "border-red-500  cursor-not-allowed hover:scale-110"
-                    : "cursor-pointer  border-green-500 hover:scale-110"
+                    ? "border-red-500  cursor-not-allowed bg-gray-200"
+                    : "cursor-pointer  border-green-500 hover:scale-110 bg-white"
                 } `}
-                disabled={errors.length > 0}
               >
                 Alterar
               </button>

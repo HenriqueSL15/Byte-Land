@@ -5,12 +5,14 @@ import Login from "./components/Login.jsx";
 import ConfigurationsPage from "./components/ConfigurationsPage.jsx";
 import UserPage from "./components/UserPage.jsx";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { Toaster } from "sonner";
 
 import "./App.css";
 
 function App() {
   return (
     <>
+      <Toaster richColors />
       {/* Cria um roteador com diversas rotas */}
       <Router>
         <Routes>

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 import { AuthContext } from "./AuthContext.jsx";
-import { usePopUp } from "./PopUpContext.jsx";
+import { toast } from "sonner";
 
 import axios from "axios";
 
@@ -15,9 +15,6 @@ import { LuEyeClosed } from "react-icons/lu";
 function Login() {
   // Navegação
   const navigate = useNavigate();
-
-  // Contexto de pop-up
-  const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
 
   //Contexto de login
   const { login } = useContext(AuthContext);
@@ -42,7 +39,6 @@ function Login() {
 
   //Envio do formulário de Login
   async function handleLoginSubmit() {
-    console.log("Enviando dados...");
     try {
       const response = await axios.post(
         "http://localhost:3000/login",
@@ -60,12 +56,13 @@ function Login() {
       if (response.status == 200) {
         login(response.data.user);
         console.log("Login realizado com sucesso!");
+        toast.success("Login realizado com sucesso!");
         navigate("/");
       }
     } catch (error) {
       console.log(error);
-      setPopUpMessage("Email ou senha incorretos!");
-      showPopUp();
+
+      toast.error("Email ou senha incorretos!");
     }
     console.log(`Email: ${email}\nSenha: ${password}`);
   }
@@ -152,11 +149,9 @@ function Login() {
                 if (isEmailValid && password != "") {
                   handleLoginSubmit();
                 } else if (email == "" || password == "") {
-                  setPopUpMessage("Preencha todos os campos!");
-                  showPopUp(true);
+                  toast.error("Preencha todos os campos!");
                 } else if (!isEmailValid && email != "") {
-                  setPopUpMessage("Email inválido!");
-                  showPopUp(true);
+                  toast.error("Email inválido!");
                 }
               }}
             >
@@ -179,26 +174,6 @@ function Login() {
           </div>
         </div>
       </div>
-      {/* Pop-up*/}
-      {show && (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/50">
-          <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130 ">
-            <p className="text-red-500 text-center font-poppins text-sm font-semibold">
-              {message}
-            </p>
-            <button
-              type="button"
-              className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
-              onClick={() => {
-                setPopUpMessage("");
-                closePopUp();
-              }}
-            >
-              Tentar novamente
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

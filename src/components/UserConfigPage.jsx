@@ -3,6 +3,7 @@ import { CiImageOn } from "react-icons/ci";
 import { AuthContext } from "./AuthContext.jsx";
 import validator from "validator";
 import axios from "axios";
+import { toast } from "sonner";
 
 function UserConfigPage() {
   const { user, login } = useContext(AuthContext);
@@ -40,19 +41,25 @@ function UserConfigPage() {
   };
 
   async function handleSubmit() {
+    // Verificar se algum campo foi alterado
+    console.log(email !== null);
+    const isNameChanged = name !== "" && name !== null;
+    const isEmailChanged = email !== "" && email !== null;
+    const isImageChanged = image !== "" && image !== null;
+
+    if (!isNameChanged && !isEmailChanged && !isImageChanged) {
+      toast.info("Nenhuma informação foi alterada!");
+      return;
+    }
+
     const formData = new FormData();
 
-    if (name != "" && name != null) {
-      formData.append("name", name);
-    }
+    formData.append("name", name);
 
-    if (isEmailValid) {
-      formData.append("email", email);
-    }
+    formData.append("email", email);
 
     if (image) {
       formData.append("image", image);
-      console.log(image);
     }
 
     try {
@@ -67,6 +74,7 @@ function UserConfigPage() {
       );
 
       if (response.status == 200) {
+        toast.success("Informações editadas com sucesso!");
         setName("");
         setEmail("");
         setImage("");
@@ -74,7 +82,8 @@ function UserConfigPage() {
         login(response.data.user);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      toast.error("Erro ao editar informações! Tente novamente");
     }
   }
 

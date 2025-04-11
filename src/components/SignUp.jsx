@@ -7,16 +7,13 @@ import { usePopUp } from "./PopUpContext.jsx";
 import axios from "axios";
 import PasswordValidator from "password-validator";
 
+import { toast } from "sonner";
+
 import { LuEye } from "react-icons/lu";
 import { LuEyeClosed } from "react-icons/lu";
 
 function SignUp() {
   const navigate = useNavigate();
-  // Contexto de pop-up
-  const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
-
-  //Verificação se existe conflito de email ou usuário
-  // const [conflict, setConflict] = useState(null);
 
   // Contexto de autenticação
   const { login } = useContext(AuthContext);
@@ -128,13 +125,13 @@ function SignUp() {
       ) {
         // login(response.data.user);
         navigate("/login");
-        console.log("Sign Up realizado com sucesso!");
+        toast.success("Usuário criado com sucesso!");
       } else if (response.status == 200) {
-        setPopUpMessage(response.data.message);
-        showPopUp();
+        toast.error(response.data.message);
       }
     } catch (error) {
       console.log(error);
+      toast.error("Erro ao cadastrar usuário!");
     }
     console.log(`Usuário: ${user}\nEmail: ${email}\nSenha: ${password1}`);
   }
@@ -315,17 +312,15 @@ function SignUp() {
                   password1 == "" ||
                   password2 == ""
                 ) {
-                  setPopUpMessage("Preencha todos os campos!");
-                  showPopUp(true);
+                  toast.error("Preencha todos os campos!");
                 } else if (!isEmailValid && isPasswordValid) {
-                  setPopUpMessage("Email inválido!");
-                  showPopUp(true);
+                  toast.error("Email inválido!");
                 } else if (isEmailValid && !isPasswordValid) {
-                  setPopUpMessage("Senha inválida!");
-                  showPopUp(true);
+                  toast.error("Senha inválida!");
                 } else if (!isEmailValid && !isPasswordValid) {
-                  setPopUpMessage("Email e senha inválidos!");
-                  showPopUp(true);
+                  toast.error("Email e senha inválidos!");
+                } else if (errors.length > 0) {
+                  toast.error("Senha inválida!");
                 }
               }}
             >
@@ -348,36 +343,6 @@ function SignUp() {
           </div>
         </div>
       </div>
-      {show && (
-        <div className="fixed inset-0 flex justify-center items-center bg-gray-900/50">
-          <div className="absolute flex flex-col items-center justify-center gap-2 bg-white border-2 p-10 rounded-lg scale-130 ">
-            <p className="text-red-500 text-center font-poppins text-sm font-semibold">
-              {message}
-            </p>
-            <button
-              type="button"
-              className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
-              onClick={() => {
-                if (message == "Esse nome de usuário já está em uso.") {
-                  setUser("");
-                } else if (message == "Esse e-mail já está em uso.") {
-                  setEmail("");
-                } else if (
-                  message == "Este nome de usuário e e-mail já estão em uso."
-                ) {
-                  setUser("");
-                  setEmail("");
-                }
-
-                setPopUpMessage("");
-                closePopUp();
-              }}
-            >
-              Tentar novamente
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

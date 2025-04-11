@@ -6,6 +6,7 @@ import { useContext, useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext.jsx";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 
 const fetchFriendsFn = async (userId) => {
   try {
@@ -81,6 +82,27 @@ function Friends() {
 
   const handleFriendRequestOption = async (userId, friendId, status) => {
     try {
+      if (status === "accepted") {
+        if (allFriends) {
+          const acceptedFriend = pendingFriendRequests.find(
+            (friend) => friend.sender === friendId
+          );
+
+          if (acceptedFriend) {
+            setPendingFriendRequests((prev) =>
+              prev.filter((friend) => friend.sender !== friendId)
+            );
+
+            const updatedFriend = { ...acceptedFriend, status: "accepted" };
+            setFriends((prev) => [...prev, updatedFriend]);
+          }
+        }
+      } else if (status === "rejected") {
+        setPendingFriendRequests((prev) => {
+          prev.filter((friend) => friend.sender !== friendId);
+        });
+      }
+
       const response = await axios.patch(
         `http://localhost:3000/users/${userId}/friends/${friendId}`,
         {
@@ -89,18 +111,20 @@ function Friends() {
       );
 
       if (status === "accepted") {
+        addNotificationToOwner(friendId, userId, "Negou seu pedido de amizade");
+        toast.success("Pedido de amizade negado!");
+      } else if (status === "rejected") {
         addNotificationToOwner(
           friendId,
           userId,
           "Aceitou seu pedido de amizade"
         );
-      } else if (status === "rejected") {
-        addNotificationToOwner(friendId, userId, "Negou seu pedido de amizade");
+        toast.success("Pedido de amizade aceito!");
       }
 
-      if (response.status === 200) {
-        queryClient.invalidateQueries(["allFriends", user._id]);
-      }
+      // if (response.status === 200) {
+      //   queryClient.invalidateQueries(["allFriends", user._id]);
+      // }
 
       return response.data;
     } catch (error) {
@@ -121,7 +145,8 @@ function Friends() {
         <div className="flex flex-col gap-5 p-5">
           <div>
             <h2 className="text-xl font-semibold font-montserrat">
-              Pendentes ({pendingFriendRequests.length})
+              Pendentes (
+              {pendingFriendRequests ? pendingFriendRequests.length : 0})
             </h2>
             <div>
               {pendingFriendRequests?.map((friend, index) => (
@@ -162,7 +187,16 @@ function Friends() {
                         >
                           Aceitar
                         </button>
-                        <button className="border-2 px-5 py-3 font-montserrat font-bold rounded-lg cursor-pointer hover:bg-gray-200 text-xl">
+                        <button
+                          onClick={() =>
+                            handleFriendRequestOption(
+                              user._id,
+                              friend.sender,
+                              "rejected"
+                            )
+                          }
+                          className="border-2 px-5 py-3 font-montserrat font-bold rounded-lg cursor-pointer hover:bg-gray-200 text-xl"
+                        >
                           Recusar
                         </button>
                       </div>
@@ -192,9 +226,10 @@ function Friends() {
                           }
                           alt="Foto do dono da notificação"
                           className="w-15 h-15 rounded-full"
-                          onClick={() =>
-                            navigate(`/userPage/${friend.user._id}`)
-                          }
+                          onClick={() => {
+                            navigate(`/userPage/${friend.user._id}`);
+                            setShowFriends(false);
+                          }}
                         />
                       </button>
                       <div className="flex flex-col gap-1">

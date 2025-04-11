@@ -7,12 +7,11 @@ import { CiImageOn } from "react-icons/ci";
 import { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import LoadingScreen from "./LoadingScreen.jsx";
-
+import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { usePopUp } from "./PopUpContext.jsx";
 import axios from "axios";
-import PopUp from "./PopUp.jsx";
 
 const fetchComments = async (publicationId) => {
   const { data } = await axios.get(
@@ -74,8 +73,6 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
 
   // Contexto do usuário
   const { user } = useContext(AuthContext);
-  // Estado para mostrar ou não o botão de deletar publicação
-  const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
 
   const newCommentLimit = 125;
 
@@ -113,8 +110,9 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
       queryClient.invalidateQueries({ queryKey: ["comments", id] });
 
       setNewComment("");
-      setPopUpMessage("Comentário adicionado com sucesso!");
-      showPopUp();
+
+      toast.success("Comentário adicionado com sucesso!");
+
       if (owner._id !== user._id) {
         addNotificationToOwner(
           owner._id,
@@ -125,8 +123,8 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     },
     onError: (error) => {
       console.error("Erro ao adicionar o comentário:", error);
-      setPopUpMessage("Erro ao adicionar comentário. Tente novamente.");
-      showPopUp();
+
+      toast.error("Erro ao adicionar comentário. Tente novamente.");
     },
   });
 
@@ -134,13 +132,12 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     mutationFn: deleteCommentMutationFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comments", id] });
-      setPopUpMessage("Comentário deletado com sucesso!");
-      showPopUp();
+
+      toast.success("Comentário deletado com sucesso!");
     },
     onError: (error) => {
       console.error("Erro ao deletar o comentário:", error);
-      // setPopUpMessage("Erro ao deletar comentário. Tente novamente.");
-      // showPopUp();
+      toast.error("Erro ao deletar comentário. Tente novamente.");
     },
   });
 
@@ -148,13 +145,13 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     mutationFn: deletePublicationMutationFn,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["publications"] });
-      setPopUpMessage("Publicação deletada com sucesso!");
-      showPopUp();
+
+      toast.success("Publicação deletada com sucesso!");
     },
     onError: (error) => {
       console.error("Erro ao deletar a publicação:", error);
-      // setPopUpMessage("Erro ao deletar publicação. Tente novamente.");
-      // showPopUp();
+
+      toast.error("Erro ao deletar publicação. Tente novamente.");
     },
   });
 
@@ -186,13 +183,13 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
       queryClient.invalidateQueries({ queryKey: ["publications"] });
 
       setEdit(false);
-      setPopUpMessage("Publicação editada com sucesso!");
-      showPopUp();
+
+      toast.success("Publicação editada com sucesso!");
     },
     onError: (error) => {
       console.error("Erro ao editar a publicação:", error);
-      // setPopUpMessage("Erro ao editar publicação. Tente novamente.");
-      // showPopUp();
+
+      toast.error("Erro ao editar a publicação. Tente novamente");
     },
   });
 
@@ -223,8 +220,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
       editedImage !== "EXISTING_IMAGE";
 
     if (!hasChanges) {
-      setPopUpMessage("Nenhuma alteração foi feita.");
-      showPopUp();
+      toast.info("Nenhuma alteração foi feita.");
       return; // Sai da função se não houver alterações
     }
 
@@ -569,10 +565,6 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                     className="font-bold py-2 px-4 rounded-full bg-white border-2 cursor-pointer hover:scale-103 hover:bg-black hover:text-white hover:border-2 transition-all"
                     onClick={() => {
                       handleEditPublication();
-                      // setPopUpMessage(
-                      //   "Deseja editar essa publicação? Essa ação não tem retorno."
-                      // );
-                      // showPopUp();
                     }}
                   >
                     <IoSend className="w-5 h-5" />

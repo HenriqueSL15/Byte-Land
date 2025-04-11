@@ -7,6 +7,7 @@ import { CiImageOn } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
 import { AuthContext } from "./AuthContext.jsx";
 import { useParams } from "react-router-dom";
+import { toast } from "sonner";
 
 import { useNavigate } from "react-router-dom";
 
@@ -20,8 +21,6 @@ const fetchFriendsFn = async (userId) => {
     const response = await axios.get(
       `http://localhost:3000/users/${userId}/friends`
     );
-
-    console.log(response.data.friends);
 
     return response.data.friends;
   } catch (error) {
@@ -61,7 +60,6 @@ function UserPage() {
 
   const [editInfo, setEditInfo] = useState(false);
 
-  const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
   const fileInputRef = React.useRef(null);
 
   const [isFriend, setIsFriend] = useState(false);
@@ -90,23 +88,13 @@ function UserPage() {
       setEditedDescription("");
       setEditedImage(null);
       setEditInfo(false);
+      toast.success("Informações editadas com sucesso!");
     },
     onError: (error) => {
       console.log(error);
+      toast.error("Erro ao editar informações! Tente novamente");
     },
   });
-
-  function renderPopUps() {
-    if (!show) return null;
-
-    return (
-      <>
-        <div className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-50">
-          <div className="bg-white p-6 w-1/12 h-1/12"></div>
-        </div>
-      </>
-    );
-  }
 
   const handleDeleteImage = () => {
     setEditedImage(null);
@@ -143,8 +131,14 @@ function UserPage() {
 
   async function handleSaveChanges() {
     const formData = new FormData();
+
     formData.append("image", editedImage);
-    formData.append("description", editedDescription);
+
+    if (editedDescription) formData.append("description", editedDescription);
+
+    if (!editedDescription && !editedImage) {
+      return toast.info("Nenhuma alteração foi feita.");
+    }
 
     updateUserMutation.mutate({
       userId: userData.user._id,
@@ -157,7 +151,7 @@ function UserPage() {
       const response = await axios.post(
         `http://localhost:3000/users/${userId}/friends/${friendId}`
       );
-
+      toast.success("Solicitação enviada com sucesso!");
       addNotificationToOwner(
         friendId,
         userId,
@@ -167,18 +161,16 @@ function UserPage() {
       return response.data;
     } catch (error) {
       console.error(error);
+      toast.error("Erro ao enviar solicitação de amizade");
     }
   };
 
   const handleRemoveFriend = async (userId, friendId) => {
     try {
-      const response = await axios.patch(
-        `http://localhost:3000/users/${userId}/friends/${friendId}`,
-        {
-          status: "rejected",
-        }
+      const response = await axios.delete(
+        `http://localhost:3000/users/${userId}/friends/${friendId}`
       );
-
+      toast.success("Amizade desfeita com sucesso!");
       addNotificationToOwner(friendId, userId, "Desfez sua amizade");
       if (response.status === 200) {
         queryClient.invalidateQueries(["allFriends", user._id]);
@@ -186,6 +178,7 @@ function UserPage() {
       return response.data;
     } catch (error) {
       console.error(error);
+      toast.error("Erro ao desfazer amizade");
     }
   };
 
@@ -253,7 +246,7 @@ function UserPage() {
                     : "Não possui descrição"}
                 </p>
               </div>
-              {userData.user._id === user._id ? (
+              {userData?.user._id === user?._id ? (
                 <button
                   type="button"
                   className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
@@ -366,7 +359,6 @@ function UserPage() {
             </div>
           </div>
         )}
-        {/* {renderPopUps()} */}
       </div>
       <div className="w-3/12">
         <RightPart />

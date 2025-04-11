@@ -1,6 +1,7 @@
 import { CiImageOn } from "react-icons/ci";
 import React, { useState, useContext, useRef } from "react";
 import axios from "axios";
+import { toast } from "sonner";
 
 import { AuthContext } from "./AuthContext.jsx";
 import { usePopUp } from "./PopUpContext.jsx";
@@ -22,9 +23,6 @@ const createPublication = async (formData) => {
 };
 
 function NewPublicationBox() {
-  //Contexto de pop-up
-  const { show, showPopUp, closePopUp, message, setPopUpMessage } = usePopUp();
-
   const inputRef = useRef(null);
 
   const [image, setImage] = useState(null);
@@ -41,18 +39,14 @@ function NewPublicationBox() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["publications"] });
 
-      setPopUpMessage("Publicação criada com sucesso!");
-      showPopUp();
+      toast.success("Publicação criada com sucesso!");
       setTitle("");
       setDescription("");
       setImage(null);
     },
     onError: (error) => {
       console.error("Erro ao enviar a publicação:", error);
-      setPopUpMessage(
-        error.response?.data?.message || "Erro ao criar publicação."
-      );
-      showPopUp();
+      toast.error(error.response?.data?.message);
     },
   });
 
@@ -74,8 +68,7 @@ function NewPublicationBox() {
 
   const handleSubmitPublication = async () => {
     if (!title || !description) {
-      setPopUpMessage("Preencha todos os campos!");
-      showPopUp();
+      toast.error("Preencha todos os campos!");
       return;
     }
 
