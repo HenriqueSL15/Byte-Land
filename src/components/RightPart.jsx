@@ -1,8 +1,7 @@
 import Profile from "./Profile.jsx";
-import { usePopUp } from "./PopUpContext.jsx";
+import { motion, AnimatePresence } from "framer-motion";
 
 function RightPart() {
-  const { show } = usePopUp();
   const example = [
     {
       img: "https://cdn-icons-png.flaticon.com/512/711/711769.png",
@@ -22,7 +21,15 @@ function RightPart() {
   ];
 
   return (
-    <div className={`flex flex-col p-10 `}>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.2,
+        ease: "easeInOut",
+      }}
+      className={`flex flex-col p-10 `}
+    >
       <h1 className="text-3xl text-center font-funnel-sans font-semibold mb-10">
         Perfis Sugeridos
       </h1>
@@ -38,7 +45,7 @@ function RightPart() {
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 }
 

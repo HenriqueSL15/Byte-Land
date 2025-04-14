@@ -3,7 +3,7 @@ import validator from "validator";
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext.jsx";
-import { usePopUp } from "./PopUpContext.jsx";
+
 import axios from "axios";
 import PasswordValidator from "password-validator";
 

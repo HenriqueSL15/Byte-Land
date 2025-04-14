@@ -11,8 +11,10 @@ import { queryClient } from "../main.jsx";
 
 import { useContext, useState, useEffect } from "react";
 
+import { motion, AnimatePresence } from "framer-motion";
+
 import { AuthContext } from "./AuthContext.jsx";
-import { usePopUp } from "./PopUpContext.jsx";
+
 import Notifications from "./Notifications.jsx";
 import Friends from "./Friends.jsx";
 import { useNotifications } from "./NotificationContext.jsx";
@@ -29,9 +31,6 @@ async function fetchNotifications(userId) {
 function LeftPart() {
   //Contexto do usuário
   const { user, logout } = useContext(AuthContext);
-
-  //Contexto do pop up
-  const { show } = usePopUp();
 
   //Contexto das notificações
   const { showNotifications, setShowNotifications } = useNotifications();
@@ -103,13 +102,24 @@ function LeftPart() {
   }
 
   return (
-    <div className={`flex flex-col p-10 h-screen text-center`}>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{
+        duration: 0.2,
+        ease: "easeInOut",
+      }}
+      className={`flex flex-col p-10 h-screen text-center`}
+    >
       {buttons.map((button) => (
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           key={button.id}
           type="button"
           onClick={() => handleClick(button.text)}
-          className="flex gap-4 p-2 cursor-pointer my-3"
+          className="flex gap-4 p-2 w-auto cursor-pointer my-3"
         >
           {button.icon}
           <p className="text-2xl font-montserrat font-medium">{button.text}</p>
@@ -120,7 +130,7 @@ function LeftPart() {
               </p>
             </div>
           )}
-        </button>
+        </motion.button>
       ))}
       <div className="flex flex-col mt-auto">
         <div className="flex gap-4 p-2 my-3">
@@ -145,13 +155,15 @@ function LeftPart() {
                   {user.name}
                 </button>
               </div>
-              <button
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
                 type="button"
                 onClick={handleLogout}
                 className="border-2 px-5 py-3 font-montserrat font-bold rounded-lg cursor-pointer hover:bg-gray-200 text-xl"
               >
                 Deslogar
-              </button>
+              </motion.button>
             </div>
           ) : (
             <Link
@@ -163,10 +175,11 @@ function LeftPart() {
           )}
         </div>
       </div>
-
-      {showNotifications && <Notifications />}
-      {showFriends && <Friends />}
-    </div>
+      <AnimatePresence>
+        {showNotifications && <Notifications />}
+        {showFriends && <Friends />}
+      </AnimatePresence>
+    </motion.div>
   );
 }
 

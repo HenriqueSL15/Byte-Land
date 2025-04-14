@@ -4,6 +4,7 @@ import { AuthContext } from "./AuthContext.jsx";
 import validator from "validator";
 import axios from "axios";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 function UserConfigPage() {
   const { user, login } = useContext(AuthContext);
@@ -104,11 +105,25 @@ function UserConfigPage() {
   }, [email]);
 
   return (
-    <div className="min-h-screen flex justify-end items-top border-l-2">
+    <motion.div
+      key={"user-config-page"}
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.2,
+        ease: "easeInOut",
+      }}
+      className="min-h-screen flex justify-end items-top"
+    >
       <div className="flex flex-col w-9/10">
-        <h1 className="font-semibold text-4xl text-gray-800 text-center py-5 mt-3 font-montserrat">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05, duration: 0.2, ease: "easeInOut" }}
+          className="font-semibold text-4xl text-gray-800 text-center py-5 mt-3 font-montserrat"
+        >
           Informações do Usuário
-        </h1>
+        </motion.h1>
         <div className="flex flex-col  mx-20 shadow-xl p-10 rounded-xl gap-10">
           <div className="w-full h-24 ">
             <h2 className="text-3xl text-gray-800 mb-2 font-semibold flex gap-3">
@@ -156,7 +171,11 @@ function UserConfigPage() {
               />
             </h2>
             {!imagePreview && (
-              <div className="relative w-10">
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative w-10"
+              >
                 {/* Input de arquivo escondido */}
                 <input
                   type="file"
@@ -168,43 +187,54 @@ function UserConfigPage() {
                 <label htmlFor="fileInput" className="cursor-pointer ">
                   <CiImageOn className="w-20 h-20 text-gray-800 hover:bg-gray-200 border-2 border-black rounded-lg" />
                 </label>
-              </div>
+              </motion.div>
             )}
             <div className="flex items-center gap-4">
-              {imagePreview && ( // Exibe a prévia da nova imagem abaixo do input
-                <div className="mt-4 flex flex-col items-center gap-3 bg-gray-100 p-5 rounded-lg justify-center">
-                  <h3 className="text-xl text-gray-800 mb-2 font-semibold font-poppins">
-                    Nova Foto de Perfil:
-                  </h3>
-                  <img
-                    src={imagePreview}
-                    alt="Prévia da nova imagem"
-                    className="w-20 h-20 rounded-full"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleDeleteImage}
-                    className="bg-white font-funnel-sans border-2 border-black hover:bg-gray-100 text-black px-4 py-2 rounded-lg cursor-pointer"
+              <AnimatePresence mode="wait">
+                {imagePreview && ( // Exibe a prévia da nova imagem abaixo do input
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="mt-4 flex flex-col items-center gap-3 bg-gray-100 p-5 rounded-lg justify-center"
                   >
-                    Deletar
-                  </button>
-                </div>
-              )}
+                    <h3 className="text-xl text-gray-800 mb-2 font-semibold font-poppins">
+                      Nova Foto de Perfil:
+                    </h3>
+                    <img
+                      src={imagePreview}
+                      alt="Prévia da nova imagem"
+                      className="w-20 h-20 rounded-full"
+                    />
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      type="button"
+                      onClick={handleDeleteImage}
+                      className="bg-white font-funnel-sans border-2 border-black hover:bg-gray-100 text-black px-4 py-2 rounded-lg cursor-pointer"
+                    >
+                      Deletar
+                    </motion.button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           </div>
 
           <div className="flex justify-center items-center">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="button"
               onClick={handleSubmit}
               className="border-2 border-black p-10 cursor-pointer hover:bg-black hover:text-white transition-all font-bold py-2 px-4 rounded"
             >
               Salvar
-            </button>
+            </motion.button>
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

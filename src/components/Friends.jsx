@@ -7,6 +7,7 @@ import { AuthContext } from "./AuthContext.jsx";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 const fetchFriendsFn = async (userId) => {
   try {
@@ -112,19 +113,15 @@ function Friends() {
 
       if (status === "accepted") {
         addNotificationToOwner(friendId, userId, "Negou seu pedido de amizade");
-        toast.success("Pedido de amizade negado!");
+        toast.success("Pedido de amizade aceito!");
       } else if (status === "rejected") {
         addNotificationToOwner(
           friendId,
           userId,
           "Aceitou seu pedido de amizade"
         );
-        toast.success("Pedido de amizade aceito!");
+        toast.success("Pedido de amizade negado!");
       }
-
-      // if (response.status === 200) {
-      //   queryClient.invalidateQueries(["allFriends", user._id]);
-      // }
 
       return response.data;
     } catch (error) {
@@ -133,25 +130,68 @@ function Friends() {
   };
 
   return (
-    <div className="w-full h-screen bg-black/50 absolute z-50 left-0 top-0 flex justify-center items-center">
-      <div className="bg-white w-2/4 h-5/6 rounded-lg relative">
-        <h1 className="text-3xl font-funnel-sans p-5">Amigos</h1>
-        <button className="absolute cursor-pointer w-14 h-14 right-3 top-2">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="w-full h-screen bg-black/50 absolute z-50 left-0 top-0 flex justify-center items-center"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.98 }}
+        transition={{
+          duration: 0.2,
+          ease: "easeInOut",
+        }}
+        className="bg-white w-2/4 h-5/6 rounded-lg relative"
+      >
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-3xl font-funnel-sans p-5"
+        >
+          Amigos
+        </motion.h1>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="absolute cursor-pointer w-14 h-14 right-3 top-2"
+        >
           <IoCloseOutline
             className="w-full h-full hover:scale-110 transform transition-all"
             onClick={() => setShowFriends(false)}
           />
-        </button>
+        </motion.button>
         <div className="flex flex-col gap-5 p-5">
           <div>
-            <h2 className="text-xl font-semibold font-montserrat">
+            <motion.h2
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.2,
+                ease: "easeInOut",
+                delay: 0.1,
+              }}
+              className="text-xl font-semibold font-montserrat"
+            >
               Pendentes (
               {pendingFriendRequests ? pendingFriendRequests.length : 0})
-            </h2>
+            </motion.h2>
             <div>
               {pendingFriendRequests?.map((friend, index) => (
                 <>
-                  <div key={index} className="w-full min-h-16 flex flex-col">
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.2,
+                      ease: "easeInOut",
+                      delay: 0.3,
+                    }}
+                    key={index}
+                    className="w-full min-h-16 flex flex-col"
+                  >
                     <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
                     <div className="flex bg-white my-3 relative">
                       <button className="cursor-pointer w-20 h-full hover:scale-105 transform transition-all">
@@ -175,7 +215,9 @@ function Friends() {
                         </p>
                       </div>
                       <div className="flex gap-2 justify-end absolute right-0">
-                        <button
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           className="border-2 px-5 py-3 font-montserrat font-bold rounded-lg cursor-pointer hover:bg-gray-200 text-xl"
                           onClick={() =>
                             handleFriendRequestOption(
@@ -186,8 +228,10 @@ function Friends() {
                           }
                         >
                           Aceitar
-                        </button>
-                        <button
+                        </motion.button>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
                           onClick={() =>
                             handleFriendRequestOption(
                               user._id,
@@ -198,22 +242,41 @@ function Friends() {
                           className="border-2 px-5 py-3 font-montserrat font-bold rounded-lg cursor-pointer hover:bg-gray-200 text-xl"
                         >
                           Recusar
-                        </button>
+                        </motion.button>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 </>
               ))}
             </div>
           </div>
           <div>
-            <h2 className="text-xl font-semibold font-montserrat">
+            <motion.h2
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                duration: 0.2,
+                ease: "easeInOut",
+                delay: 0.2,
+              }}
+              className="text-xl font-semibold font-montserrat"
+            >
               Amigos ({friends.length})
-            </h2>
+            </motion.h2>
             <div>
               {friends?.map((friend, index) => (
                 <>
-                  <div key={index} className="w-full min-h-16 flex flex-col">
+                  <motion.div
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                      duration: 0.2,
+                      ease: "easeInOut",
+                      delay: 0.3,
+                    }}
+                    key={index}
+                    className="w-full min-h-16 flex flex-col"
+                  >
                     <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
                     <div className="flex bg-white my-3 relative">
                       <button className="cursor-pointer w-20 h-full hover:scale-103 transform transition-all overflow-visible relative z-10">
@@ -241,14 +304,14 @@ function Friends() {
                         </p>
                       </div>
                     </div>
-                  </div>
+                  </motion.div>
                 </>
               ))}
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

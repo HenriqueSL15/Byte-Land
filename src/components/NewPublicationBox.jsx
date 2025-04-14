@@ -1,10 +1,10 @@
 import { CiImageOn } from "react-icons/ci";
 import React, { useState, useContext, useRef } from "react";
 import axios from "axios";
+import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
 import { AuthContext } from "./AuthContext.jsx";
-import { usePopUp } from "./PopUpContext.jsx";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -18,7 +18,7 @@ const createPublication = async (formData) => {
       },
     }
   );
-  console.log("resposta do servidor:", response.status);
+
   return response.data;
 };
 
@@ -84,7 +84,16 @@ function NewPublicationBox() {
   };
 
   return (
-    <div className={`flex items-center justify-center mb-10 z-10`}>
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{
+        duration: 0.2,
+        ease: "easeInOut",
+      }}
+      className={`flex items-center justify-center mb-10 z-10`}
+    >
       <div className="w-9/10 shadow-lg rounded-lg my-5">
         <div className="m-5 mb-5 flex items-center gap-2">
           <img
@@ -127,7 +136,7 @@ function NewPublicationBox() {
             </div>
             <div className="w-full relative">
               <textarea
-                className="text-base text-gray-800 w-full font-funnel-sans   mb-5 overflow-y-scroll scrollbar-hide h-[200px] p-2 border-1 border-gray-500 rounded-lg"
+                className="text-base text-gray-800 w-full font-funnel-sans mb-5 overflow-y-scroll scrollbar-hide h-[200px] p-2 border-1 border-gray-500 rounded-lg"
                 placeholder="Conteúdo da publicação"
                 value={description}
                 onChange={(e) => {
@@ -145,52 +154,69 @@ function NewPublicationBox() {
               </h2>
             </div>
           </div>
+          <div>
+            {/* Exibe a imagem selecionada */}
+            <AnimatePresence>
+              {image && (
+                <motion.img
+                  initial={{ opacity: 1, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{
+                    duration: 0.2,
+                    ease: "easeInOut",
+                  }}
+                  src={URL.createObjectURL(image)}
+                  alt="Imagem selecionada"
+                  className="max-h-60 w-auto mx-auto object-contain mb-5 rounded-lg "
+                />
+              )}
+            </AnimatePresence>
 
-          {/* Exibe a imagem selecionada */}
-          {image && (
-            <img
-              src={URL.createObjectURL(image)}
-              alt="Imagem selecionada"
-              className="max-h-60 w-auto mx-auto object-contain mb-5 rounded-lg"
-            />
-          )}
-
-          <div className="flex items-center justify-between">
-            {/* Botão para selecionar imagem */}
-            <label className="flex items-center justify-center w-16 h-16 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
-              <CiImageOn className="w-14 h-14" />
-              <input
-                type="file"
-                onChange={handleImageChange}
-                accept="image/*"
-                className="hidden"
-                ref={inputRef}
-              />
-            </label>
-
-            {/* Botão para apagar imagem */}
-            {image && (
-              <button
-                type="button"
-                className="text-black h-1/2 font-bold border-2 w-1/4 py-2 px-4 rounded-full cursor-pointer"
-                onClick={removeImage}
+            <motion.div className="flex items-center justify-between">
+              {/* Botão para selecionar imagem */}
+              <motion.label
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex items-center justify-center w-16 h-16 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
               >
-                Delete Image
-              </button>
-            )}
-          </div>
+                <CiImageOn className="w-14 h-14" />
+                <input
+                  type="file"
+                  onChange={handleImageChange}
+                  accept="image/*"
+                  className="hidden"
+                  ref={inputRef}
+                />
+              </motion.label>
 
-          {/* Botão de enviar */}
-          <button
-            type="button"
-            onClick={handleSubmitPublication}
-            className="mt-5 text-center w-2/6 p-3 rounded-lg h-full border-2 font-poppins font-semibold text-xl cursor-pointer hover:bg-gray-100 hover:text-gray-900"
-          >
-            Enviar Publicação
-          </button>
+              {/* Botão para apagar imagem */}
+              {image && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="text-black h-1/2 font-bold w-1/4 py-2 px-4 rounded-full text-center p-3  font-poppins text-md border-2 cursor-pointer hover:bg-gray-100 hover:text-gray-900"
+                  onClick={removeImage}
+                >
+                  Delete Image
+                </motion.button>
+              )}
+            </motion.div>
+
+            {/* Botão de enviar */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              type="button"
+              onClick={handleSubmitPublication}
+              className="mt-5 text-center w-2/6 p-3 rounded-lg h-full border-2 font-poppins font-semibold text-xl cursor-pointer hover:bg-gray-100 hover:text-gray-900"
+            >
+              Enviar Publicação
+            </motion.button>
+          </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 

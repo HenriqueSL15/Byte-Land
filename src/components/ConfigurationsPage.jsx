@@ -6,6 +6,8 @@ import { useContext } from "react";
 import { AuthContext } from "./AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 
+import { motion, AnimatePresence } from "framer-motion";
+
 function ConfigurationsPage() {
   const { user, isLoading } = useContext(AuthContext);
   const navigate = useNavigate();

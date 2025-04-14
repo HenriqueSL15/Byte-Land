@@ -10,7 +10,8 @@ import LoadingScreen from "./LoadingScreen.jsx";
 import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { usePopUp } from "./PopUpContext.jsx";
+import { motion, AnimatePresence } from "framer-motion";
+
 import axios from "axios";
 
 const fetchComments = async (publicationId) => {
@@ -91,6 +92,9 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
 
   // Estado para alterar a exibição do botão para um form
   const [edit, setEdit] = useState(false);
+
+  const titleLimit = 100;
+  const descriptionLimit = 500;
 
   const queryClient = useQueryClient();
 
@@ -280,11 +284,23 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
 
   return (
     <>
-      {!edit ? (
-        <div className="flex items-center justify-center border-[2px] border-gray-200 m-10 mb-10 rounded-3xl">
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{
+            duration: 0.3,
+            ease: "easeInOut",
+          }}
+          key="publication"
+          className="flex items-center justify-center border-[2px] border-gray-200 m-10 mb-10 rounded-3xl"
+        >
           <div className={`w-9/10 min-h-[300px] rounded-lg my-5`}>
             {/* Conteúdo da publicação */}
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               type="button"
               onClick={() => navigate(`/userPage/${owner._id}`)}
               className="m-5 mb-10 flex cursor-pointer gap-2"
@@ -307,7 +323,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   {new Date(date).toLocaleString("pt-BR")}
                 </h2>
               </div>
-            </button>
+            </motion.button>
             <div className="m-5 overflow-y-auto scrollbar-hide">
               <h1 className="text-2xl mb-3 font-funnel-sans">{title}</h1>
               <h2 className="text-base text-gray-800 font-funnel-sans">
@@ -330,7 +346,9 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
             {/* Botão de deletar publicação */}
             {isOwner && (
               <div className="flex justify-start px-5 items-center gap-2 mb-5 h-[20px]">
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   className="font-bold py-2 px-4 rounded-full bg-white border-2 cursor-pointer hover:scale-103 hover:bg-black hover:text-white hover:border-2 transition-all"
                   onClick={() => {
@@ -338,8 +356,10 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   }}
                 >
                   <FaTrashCan className="w-5 h-5" />
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   className="font-bold py-2 px-4 rounded-full bg-white border-2 cursor-pointer hover:scale-103 hover:bg-black hover:text-white hover:border-2 transition-all"
                   onClick={() => {
@@ -349,7 +369,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   }}
                 >
                   <FaPencilAlt className="w-5 h-5" />
-                </button>
+                </motion.button>
               </div>
             )}
             <div className="px-5 w-full h-0.5 flex mt-10">
@@ -459,14 +479,30 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                 })}
             </div>
           </div>
-        </div>
-      ) : (
-        edit && (
-          <div
+        </motion.div>
+
+        {edit && (
+          <motion.div
+            key="edit-modal"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{
+              duration: 0.2,
+              ease: "easeOut",
+            }}
             className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-49"
             id="edit-post-modal"
           >
-            <div
+            <motion.div
+              initial={{ scale: 0.98, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.98, opacity: 0 }}
+              key="edit-modal-content"
+              transition={{
+                duration: 0.2,
+                ease: "easeOut",
+              }}
               className={`min-h-[600px] rounded-lg my-5 bg-white flex flex-col w-6/10`}
             >
               {/* Conteúdo do formulário de edição */}
@@ -489,50 +525,93 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                     {new Date(date).toLocaleString("pt-BR")}
                   </h2>
                 </div>
-                <div className="h-15 w-15 flex justify-center items-center gap-2 ml-auto">
+                <motion.div
+                  whileTap={{ scale: 0.9 }}
+                  whileHover={{ scale: 1.1 }}
+                  className="h-15 w-15 flex justify-center items-center gap-2 ml-auto"
+                >
                   <button
                     className="cursor-pointer w-full h-full"
                     onClick={() => setEdit(false)}
                   >
                     <IoCloseOutline className="w-full h-full" />
                   </button>
-                </div>
+                </motion.div>
               </div>
-              <div className="m-5 overflow-y-auto scrollbar-hide">
-                <input
-                  type="text"
-                  className="text-2xl mb-3 p-2 border-b-1 w-full font-montserrat"
-                  placeholder="Título da publicação"
-                  value={editedTitle}
-                  onChange={(e) => setEditedTitle(e.target.value)}
-                />
-
-                <textarea
-                  className="text-base text-gray-800 w-full font-funnel-sans mb-5 overflow-y-scroll scrollbar-hide h-[200px] p-2 border-1 border-gray-500 rounded-lg"
-                  placeholder="Conteúdo da publicação"
-                  value={editedDescription}
-                  onChange={(e) => setEditedDescription(e.target.value)}
-                />
+              <div className="m-5 scrollbar-hide">
+                <div className="relative w-full">
+                  <input
+                    type="text"
+                    className="text-2xl mb-3 px-2 pt-2 pb-0 border-b-1 w-full font-montserrat focus:outline-none focus:border-b-2"
+                    placeholder="Título da publicação"
+                    value={editedTitle}
+                    onChange={(e) => {
+                      if (e.target.value.length <= titleLimit) {
+                        setEditedTitle(e.target.value);
+                      }
+                    }}
+                  />
+                  <h2
+                    className={`text-[15px] select-none absolute right-1 bottom-11 ${
+                      editedTitle.length == titleLimit && "text-red-500"
+                    } `}
+                  >
+                    {editedTitle.length}/{titleLimit}
+                  </h2>
+                </div>
+                <div className="relative w-full">
+                  <textarea
+                    className="text-base text-gray-800 w-full font-funnel-sans mb-1 overflow-y-scroll scrollbar-hide h-[200px] p-2 border-1 border-gray-500 rounded-lg"
+                    placeholder="Conteúdo da publicação"
+                    value={editedDescription}
+                    onChange={(e) => {
+                      if (e.target.value.length <= descriptionLimit) {
+                        setEditedDescription(e.target.value);
+                      }
+                    }}
+                  />
+                  <h2
+                    className={`text-[15px] select-none absolute right-2 bottom-7   ${
+                      editedDescription.length == descriptionLimit &&
+                      "text-red-500"
+                    } `}
+                  >
+                    {editedDescription.length}/{descriptionLimit}
+                  </h2>
+                </div>
 
                 {/* Exibe a imagem selecionada */}
-                {editedImage && (
-                  <img
-                    className={`rounded-lg max-h-60 w-auto mx-auto object-contain`}
-                    src={
-                      editedImage instanceof Blob
-                        ? URL.createObjectURL(editedImage)
-                        : editedImage === "EXISTING_IMAGE"
-                        ? `http://localhost:3000/${image}`
-                        : null
-                    }
-                    alt="Foto da publicação"
-                  />
-                )}
+                <AnimatePresence>
+                  {editedImage && (
+                    <motion.img
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{
+                        duration: 0.2,
+                        ease: "easeInOut",
+                      }}
+                      className={`rounded-lg max-h-60 w-auto mx-auto object-contain`}
+                      src={
+                        editedImage instanceof Blob
+                          ? URL.createObjectURL(editedImage)
+                          : editedImage === "EXISTING_IMAGE"
+                          ? `http://localhost:3000/${image}`
+                          : null
+                      }
+                      alt="Foto da publicação"
+                    />
+                  )}
+                </AnimatePresence>
 
                 <div className="flex items-center justify-between">
                   {/* Botão para selecionar imagem */}
                   {!editedImage && (
-                    <label className="flex items-center justify-center w-16 h-16 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer">
+                    <motion.label
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="flex items-center justify-center w-16 h-16 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                    >
                       <CiImageOn className="w-14 h-14" />
                       <input
                         type="file"
@@ -541,42 +620,46 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                         className="hidden"
                         ref={inputRef}
                       />
-                    </label>
+                    </motion.label>
                   )}
 
                   {/* Botão para apagar imagem */}
-                  {editedImage && (
-                    <button
-                      type="button"
-                      className="text-black h-1/2 font-bold border-2 w-1/4 py-2 px-4 rounded-full cursor-pointer"
-                      onClick={removeImage}
-                    >
-                      Delete Image
-                    </button>
-                  )}
+                  <div className="w-full flex justify-center mt-1">
+                    {editedImage && (
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        type="button"
+                        className="text-black h-1/2 font-bold border-2 w-1/4 py-2 px-4 rounded-full cursor-pointer "
+                        onClick={removeImage}
+                      >
+                        Delete Image
+                      </motion.button>
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Botão de editar publicação */}
               {isOwner && (
-                <div className="flex justify-start px-5 items-center gap-2 mb-5 h-[20px]">
-                  <button
+                <div className="flex justify-start px-5 items-center gap-2 mb-4 h-[20px]">
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
                     type="button"
-                    className="font-bold py-2 px-4 rounded-full bg-white border-2 cursor-pointer hover:scale-103 hover:bg-black hover:text-white hover:border-2 transition-all"
+                    className="font-bold py-2 px-4 rounded-full z-50 bg-white border-2 cursor-pointer hover:bg-black hover:text-white hover:border-2 transition-all"
                     onClick={() => {
                       handleEditPublication();
                     }}
                   >
                     <IoSend className="w-5 h-5" />
-                  </button>
+                  </motion.button>
                 </div>
               )}
-            </div>
-          </div>
-        )
-      )}
-
-      {/* Renderização dos pop-ups */}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   );
 }

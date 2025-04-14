@@ -8,12 +8,7 @@ import { IoCloseOutline } from "react-icons/io5";
 import { useNotifications } from "./NotificationContext.jsx";
 import { useNavigate } from "react-router-dom";
 
-async function fetchNotifications(userId) {
-  const { data } = await axios.get(
-    `http://localhost:3000/users/${userId}/notifications`
-  );
-  return data.notifications.reverse();
-}
+import { motion, AnimatePresence } from "framer-motion";
 
 function Notifications() {
   const { user } = useContext(AuthContext);
@@ -21,16 +16,15 @@ function Notifications() {
 
   const navigate = useNavigate();
 
-  // const notifications = queryClient.getQueryData(["notifications", user._id]);
   const {
     data: notifications,
-    refetch: fetchNotifications,
+    refetch,
     isLoadingNotifications,
     isError,
   } = useQuery({
     queryKey: ["notifications", user._id],
     queryFn: () => fetchNotifications(user._id),
-    enabled: false,
+    enabled: !!user._id,
     staleTime: Infinity,
     refetchOnWindowFocus: false,
   });
@@ -60,17 +54,39 @@ function Notifications() {
     },
   });
 
-  useEffect(() => {
-    if (user) {
-      fetchNotifications(user._id);
-    }
-  }, []);
-
   return (
-    <div className="absolute w-full h-screen bg-black/40 z-50 flex items-center justify-center top-0 left-0">
-      <div className="w-1/3 h-2/3 bg-white rounded-lg flex flex-col relative">
-        <h1 className="p-5 text-3xl font-funnel-sans">Notificações</h1>
-        <button className="absolute cursor-pointer w-14 h-14 right-3 top-2">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{
+        duration: 0.2,
+        ease: "easeInOut",
+      }}
+      className="absolute w-full h-screen bg-black/40 z-50 flex items-center justify-center top-0 left-0"
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0, scale: 0.98 }}
+        transition={{
+          duration: 0.2,
+          ease: "easeInOut",
+        }}
+        className="w-1/3 h-2/3 bg-white rounded-lg flex flex-col relative"
+      >
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-5 text-3xl font-funnel-sans"
+        >
+          Notificações
+        </motion.h1>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="absolute cursor-pointer w-14 h-14 right-3 top-2"
+        >
           <IoCloseOutline
             className="w-full h-full hover:scale-110 transform transition-all"
             onClick={() => {
@@ -78,18 +94,31 @@ function Notifications() {
               markAsReadMutation.mutate();
             }}
           />
-        </button>
+        </motion.button>
 
         <div className="flex flex-col px-3 overflow-y-auto">
           <div className="flex flex-col gap-2">
-            <h2 className="text-xl mt-3">Novas notificações</h2>
+            <motion.h2
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-xl mt-3"
+            >
+              Novas notificações
+            </motion.h2>
 
             {notifications &&
               notifications
                 .filter((notification) => !notification.read)
                 .map((notification, index) => {
                   return (
-                    <div key={index} className="w-full min-h-16 flex flex-col">
+                    <motion.div
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.2 }}
+                      key={index}
+                      className="w-full min-h-16 flex flex-col"
+                    >
                       <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
                       <div className="flex bg-white my-3">
                         <button
@@ -118,19 +147,36 @@ function Notifications() {
                           </p>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
           </div>
           <div className="flex flex-col gap-2 mt-10">
-            <h2 className="text-xl mt-3">Notificações já lidas</h2>
+            <motion.h2
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 0.2,
+              }}
+              className="text-xl mt-3"
+            >
+              Notificações já lidas
+            </motion.h2>
 
             {notifications &&
               notifications
                 .filter((notification) => notification.read)
                 .map((notification, index) => {
                   return (
-                    <div key={index} className="w-full min-h-16 flex flex-col">
+                    <motion.div
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        delay: 0.3,
+                      }}
+                      key={index}
+                      className="w-full min-h-16 flex flex-col"
+                    >
                       <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
                       <div className="flex bg-white my-3">
                         <button
@@ -159,13 +205,13 @@ function Notifications() {
                           </p>
                         </div>
                       </div>
-                    </div>
+                    </motion.div>
                   );
                 })}
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

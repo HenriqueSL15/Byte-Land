@@ -8,12 +8,12 @@ import { IoCloseOutline } from "react-icons/io5";
 import { AuthContext } from "./AuthContext.jsx";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { useNavigate } from "react-router-dom";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { usePopUp } from "./PopUpContext.jsx";
 import LoadingScreen from "./LoadingScreen.jsx";
 
 const fetchFriendsFn = async (userId) => {
@@ -207,23 +207,36 @@ function UserPage() {
   }
 
   return (
-    <div className="flex flex-row h-screen">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.2,
+        ease: "easeInOut",
+      }}
+      className="flex flex-row h-screen"
+    >
       <div className="w-3/12">
         <LeftPart />
       </div>
       <div className="w-6/12 border-x-2 border-gray-300 overflow-y-scroll scrollbar-hide relative">
         <div className="h-screen w-full p-5 flex flex-col gap-36 ">
           <div className="relative pb-14">
-            <img
-              src={
-                userData.user.image !=
-                "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                  ? `http://localhost:3000/${userData.user.image}`
-                  : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-              }
-              className="absolute bg-white bottom-0 left-3 h-32 w-32 g-black rounded-full z-48 border-3 border-white shadow-md "
-              alt="Imagem do Usuário"
-            />
+            <div className="absolute bg-white bottom-0 left-3 h-32 w-32 rounded-full z-48 border-3 border-white shadow-md overflow-hidden">
+              <motion.img
+                initial={{ scale: 1 }}
+                whileHover={{ scale: 1.15 }}
+                transition={{ duration: 0.2, ease: "easeInOut" }}
+                src={
+                  userData.user.image !=
+                  "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                    ? `http://localhost:3000/${userData.user.image}`
+                    : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                }
+                className="h-full w-full object-cover"
+                alt="Imagem do Usuário"
+              />
+            </div>
             <img
               src={
                 userData.user.userPageImage !=
@@ -247,7 +260,9 @@ function UserPage() {
                 </p>
               </div>
               {userData?.user._id === user?._id ? (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
                   onClick={() => {
@@ -255,23 +270,27 @@ function UserPage() {
                   }}
                 >
                   Editar Perfil
-                </button>
+                </motion.button>
               ) : !isFriend ? (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
                   onClick={() => handleSendFriendRequest(user._id, userId)}
                 >
                   Adicionar Amigo
-                </button>
+                </motion.button>
               ) : (
-                <button
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   type="button"
                   className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
                   onClick={() => handleRemoveFriend(user._id, userId)}
                 >
                   Desfazer Amizade
-                </button>
+                </motion.button>
               )}
             </div>
           </div>
@@ -363,7 +382,7 @@ function UserPage() {
       <div className="w-3/12">
         <RightPart />
       </div>
-    </div>
+    </motion.div>
   );
 }
 

@@ -8,9 +8,6 @@ import { AnimatePresence } from "framer-motion";
 import LoadingScreen from "./LoadingScreen.jsx";
 
 import { AuthContext } from "./AuthContext.jsx";
-import { usePopUp } from "./PopUpContext.jsx";
-
-import PopUp from "./PopUp.jsx";
 
 import { useQuery } from "@tanstack/react-query";
 

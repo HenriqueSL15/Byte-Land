@@ -3,6 +3,7 @@ import { AuthContext } from "./AuthContext.jsx";
 import axios from "axios";
 import PasswordValidator from "password-validator";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 function UserSecurityPage() {
   const { user } = useContext(AuthContext);
@@ -88,11 +89,24 @@ function UserSecurityPage() {
   }
 
   return (
-    <div className="min-h-screen flex justify-end items-top border-l-2">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{
+        duration: 0.2,
+        ease: "easeInOut",
+      }}
+      className="min-h-screen flex justify-end items-top"
+    >
       <div className="flex flex-col w-9/10">
-        <h1 className="font-semibold text-4xl text-gray-800 text-center py-5 mt-3 font-montserrat">
+        <motion.h1
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05, duration: 0.2, ease: "easeInOut" }}
+          className="font-semibold text-4xl text-gray-800 text-center py-5 mt-3 font-montserrat"
+        >
           Segurança
-        </h1>
+        </motion.h1>
         <div className="flex flex-col  mx-20 shadow-xl p-10 rounded-xl gap-10">
           <div className="w-full h-24 ">
             <h2 className="text-3xl text-gray-800 mb-2 font-semibold flex gap-3">
@@ -162,7 +176,7 @@ function UserSecurityPage() {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
