@@ -73,14 +73,6 @@ function Friends() {
     }
   }, [allFriends, user._id]);
 
-  useEffect(() => {
-    if (allFriends) {
-      console.log("allFriends atualizado:", allFriends);
-      console.log("pendingFriendRequests:", pendingFriendRequests);
-      console.log("friends:", friends);
-    }
-  }, [allFriends, pendingFriendRequests, friends]);
-
   const handleFriendRequestOption = async (userId, friendId, status) => {
     try {
       if (status === "accepted") {

@@ -7,7 +7,6 @@ import { Link, useNavigate } from "react-router-dom";
 
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { queryClient } from "../main.jsx";
 
 import { useContext, useState, useEffect } from "react";
 
@@ -18,7 +17,9 @@ import { AuthContext } from "./AuthContext.jsx";
 import Notifications from "./Notifications.jsx";
 import Friends from "./Friends.jsx";
 import { useNotifications } from "./NotificationContext.jsx";
+import { useMessages } from "./MessagesContext.jsx";
 import { useFriends } from "./FriendsContext.jsx";
+import Messages from "./Messages.jsx";
 
 async function fetchNotifications(userId) {
   const { data } = await axios.get(
@@ -32,9 +33,10 @@ function LeftPart() {
   //Contexto do usuário
   const { user, logout } = useContext(AuthContext);
 
-  //Contexto das notificações
+  //Contextos
   const { showNotifications, setShowNotifications } = useNotifications();
   const { showFriends, setShowFriends } = useFriends();
+  const { showMessages, setShowMessages } = useMessages();
 
   const {
     data: notifications,
@@ -94,6 +96,8 @@ function LeftPart() {
       navigate("/");
     } else if (text === "Notificações") {
       setShowNotifications(true);
+    } else if (text === "Mensagens") {
+      setShowMessages(true);
     } else if (text === "Amigos") {
       setShowFriends(true);
     } else if (text === "Sair") {
@@ -178,6 +182,7 @@ function LeftPart() {
       <AnimatePresence>
         {showNotifications && <Notifications />}
         {showFriends && <Friends />}
+        {showMessages && <Messages />}
       </AnimatePresence>
     </motion.div>
   );

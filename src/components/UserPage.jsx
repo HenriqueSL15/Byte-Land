@@ -316,68 +316,105 @@ function UserPage() {
             </div>
           </div>
         </div>
-        {editInfo && (
-          <div className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-50">
-            <div className="bg-white p-6 w-1/2 min-h-5/6 rounded-lg border-1 border-black relative">
-              <button
-                className="absolute right-4 w-14 h-14 cursor-pointer transform hover:scale-110 transition-all"
-                onClick={() => setEditInfo(false)}
+        <AnimatePresence>
+          {editInfo && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.2,
+                type: "tween",
+              }}
+              className="fixed inset-0 flex items-center justify-center bg-gray-900/50 z-50"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.98 }}
+                transition={{
+                  ease: "easeInOut",
+                  duration: 0.2,
+                  type: "tween",
+                }}
+                className="bg-white p-6 w-1/2 min-h-5/6 rounded-lg border-1 border-black relative"
               >
-                <IoCloseOutline className="h-full w-full" />
-              </button>
-              <h1 className="text-3xl font-semibold font-montserrat mt-3 text-center">
-                Editar informações do perfil
-              </h1>
-              <div className="flex flex-col gap-3 mt-10">
-                <h2 className="text-lg font-poppins">Descrição</h2>
-                <textarea
-                  className="bg-[#f2f2f2] font-funnel-sans placeholder-[#979797] rounded-sm min-h-32 p-2 w-full border-1 border-[#979797]"
-                  placeholder="Escreva sua nova descrição"
-                  onChange={(e) => setEditedDescription(e.target.value)}
-                  value={editedDescription}
-                ></textarea>
-              </div>
-              <div className="flex flex-col gap-3 mt-10">
-                <h2 className="text-lg font-poppins">Imagem de Fundo</h2>
-                <div className="flex flex-col gap-3 items-center">
-                  <label className="bg-[#f2f2f2] w-full min-h-44 border-1 border-[#979797] rounded-sm cursor-pointer flex items-center justify-center">
-                    {!editedImage ? (
-                      <CiImageOn className="w-full h-32" />
-                    ) : (
-                      <img
-                        src={URL.createObjectURL(editedImage)}
-                        alt="Imagem selecionada"
-                        className="min-h-36 max-h-36 w-auto"
-                        value={editedImage}
-                      />
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleImageChange}
-                      ref={fileInputRef}
-                    />
-                  </label>
-                  {editedImage && (
-                    <button
-                      onClick={handleDeleteImage}
-                      className="transform border-1 border-black bg-white w-1/3 rounded-lg p-1 hover:text-red-500 hover:border-red-500 hover:scale-101  transition-all cursor-pointer"
-                    >
-                      Remover Imagem
-                    </button>
-                  )}
-                </div>
-                <button
-                  onClick={() => handleSaveChanges()}
-                  className="hover:scale-101 transform transition-all bg-black text-white font-bold p-3 rounded-full cursor-pointer"
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="absolute right-4 w-14 h-14 cursor-pointer transform hover:scale-110 transition-all"
+                  onClick={() => setEditInfo(false)}
                 >
-                  Salvar
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+                  <IoCloseOutline className="h-full w-full" />
+                </motion.button>
+                <motion.h1
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{
+                    duration: 0.2,
+                    ease: "easeInOut",
+                    delay: 0.1,
+                  }}
+                  className="text-3xl font-semibold font-montserrat mt-3 text-center"
+                >
+                  Editar informações do perfil
+                </motion.h1>
+                <div className="flex flex-col gap-3 mt-10">
+                  <h2 className="text-lg font-poppins">Descrição</h2>
+                  <textarea
+                    className="bg-[#f2f2f2] font-funnel-sans placeholder-[#979797] rounded-sm min-h-32 p-2 w-full border-1 border-[#979797]"
+                    placeholder="Escreva sua nova descrição"
+                    onChange={(e) => setEditedDescription(e.target.value)}
+                    value={editedDescription}
+                  ></textarea>
+                </div>
+                <div className="flex flex-col gap-3 mt-10">
+                  <h2 className="text-lg font-poppins">Imagem de Fundo</h2>
+                  <div className="flex flex-col gap-3 items-center">
+                    <motion.label
+                      whileHover={{ scale: 1.01 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-[#f2f2f2] w-full min-h-44 border-1 border-[#979797] rounded-sm cursor-pointer flex items-center justify-center"
+                    >
+                      {!editedImage ? (
+                        <CiImageOn className="w-full h-32" />
+                      ) : (
+                        <img
+                          src={URL.createObjectURL(editedImage)}
+                          alt="Imagem selecionada"
+                          className="min-h-36 max-h-36 w-auto rounded-md"
+                          value={editedImage}
+                        />
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleImageChange}
+                        ref={fileInputRef}
+                      />
+                    </motion.label>
+                    {editedImage && (
+                      <button
+                        onClick={handleDeleteImage}
+                        className="transform border-1 border-black bg-white w-1/3 rounded-lg p-1 hover:text-red-500 hover:border-red-500 hover:scale-101  transition-all cursor-pointer"
+                      >
+                        Remover Imagem
+                      </button>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => handleSaveChanges()}
+                    className="hover:scale-101 transform transition-all bg-black text-white font-bold p-3 rounded-full cursor-pointer"
+                  >
+                    Salvar
+                  </button>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <div className="w-3/12">
         <RightPart />
