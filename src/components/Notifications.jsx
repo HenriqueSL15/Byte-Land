@@ -59,6 +59,11 @@ function Notifications() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          setShowNotifications(false);
+        }
+      }}
       transition={{
         duration: 0.2,
         ease: "easeInOut",
@@ -115,7 +120,7 @@ function Notifications() {
                     <motion.div
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 }}
+                      transition={{ delay: 0.2 + index * 0.1 }}
                       key={index}
                       className="w-full min-h-16 flex flex-col"
                     >
@@ -172,7 +177,7 @@ function Notifications() {
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{
-                        delay: 0.3,
+                        delay: 0.3 + index * 0.1,
                       }}
                       key={index}
                       className="w-full min-h-16 flex flex-col"
@@ -216,17 +221,3 @@ function Notifications() {
 }
 
 export default Notifications;
-
-{
-  /* <div className="bg-blue-500/50 w-full min-h-16 flex">
-  <img src="" alt="" className="w-16 h-16 rounded-full bg-black" />
-  <div className="flex flex-col gap-1">
-    <h1 className="text-start ml-4 text-lg font-semibold font-montserrat">
-      Nome da pessoa
-    </h1>
-    <p className="text-start ml-4 text-lg">
-      Lorem ipsum, dolor sit amet consectetur adipisicing
-    </p>
-  </div>
-</div>; */
-}

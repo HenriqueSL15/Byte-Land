@@ -47,8 +47,8 @@ const sendMessage = async (conversationId, senderId, content) => {
 };
 
 function Messages() {
-  const { showMessages, setShowMessages } = useMessages();
-  const [selectedFriend, setSelectedFriend] = useState(null);
+  const { showMessages, setShowMessages, selectedFriend, setSelectedFriend } =
+    useMessages();
 
   const [messages, setMessages] = useState([]);
   const [currentConversation, setCurrentConversation] = useState(null);
@@ -60,6 +60,24 @@ function Messages() {
   const queryClient = useQueryClient();
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
+
+  async function addNotificationToOwner(userId, notificationOwner, message) {
+    const notificationData = {
+      message,
+      owner: notificationOwner,
+    };
+
+    const response = await axios.post(
+      `http://localhost:3000/users/${userId}/notifications`,
+      notificationData
+    );
+
+    queryClient.invalidateQueries({
+      queryKey: ["notifications", userId],
+    });
+
+    return response.data;
+  }
 
   const {
     data: allFriends,
@@ -113,7 +131,6 @@ function Messages() {
   const handleSendMessage = async () => {
     if (!messageInput.trim() || !currentConversation) return;
 
-    console.log("akjsçflasjdfçljalkf");
     try {
       const newMessage = await sendMessage(
         currentConversation._id,
@@ -125,6 +142,12 @@ function Messages() {
         // Adicione a mensagem localmente para feedback imediato
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setMessageInput("");
+
+        addNotificationToOwner(
+          selectedFriend.user._id,
+          user._id,
+          "Mandou uma mensagem para você!"
+        );
 
         // Invalide a query para forçar uma atualização
         queryClient.invalidateQueries([
@@ -157,8 +180,15 @@ function Messages() {
     scrollToBottom();
   }, [messages]);
 
+  // Função de fechamento modificada
+  const handleClose = () => {
+    setShowMessages(false);
+    setSelectedFriend(null);
+  };
+
   return (
     <motion.div
+      id="messages-modal"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -170,7 +200,7 @@ function Messages() {
       className="absolute w-full h-screen bg-black/40 z-50 top-0 left-0 flex justify-center items-center"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
-          setShowMessages(false);
+          handleClose();
         }
       }}
     >
@@ -186,7 +216,7 @@ function Messages() {
           whileTap={{ scale: 0.95 }}
           onClick={(e) => {
             e.stopPropagation();
-            setShowMessages(false);
+            handleClose();
           }}
           className="w-16 h-20 absolute top-0 right-2"
         >
@@ -230,6 +260,7 @@ function Messages() {
                       onClick={(e) => {
                         e.stopPropagation();
                         setShowMessages(false);
+                        setSelectedFriend(null);
                         navigate(`/userPage/${friend.user._id}`);
                       }}
                       className="cursor-pointer w-14 h-14 rounded-full object-cover"
@@ -286,7 +317,7 @@ function Messages() {
                   }}
                   className="mr-3"
                 >
-                  <IoArrowBackOutline className="w-6 h-6" />
+                  <IoArrowBackOutline className="w-6 h-6 cursor-pointer" />
                 </motion.button>
                 <img
                   src={
@@ -306,7 +337,9 @@ function Messages() {
               <div className="flex-grow p-4 overflow-y-auto">
                 {messages.length > 0 ? (
                   messages.map((msg, index) => (
-                    <div
+                    <motion.div
+                      initial={{ opacity: 0, y: -20 }}
+                      animate={{ opacity: 1, y: 0 }}
                       key={index}
                       className={`mb-4 flex ${
                         msg.sender._id === user._id || msg.sender === user._id
@@ -323,7 +356,7 @@ function Messages() {
                       >
                         {msg.content}
                       </div>
-                    </div>
+                    </motion.div>
                   ))
                 ) : (
                   <div className="h-full flex items-center justify-center">
@@ -349,7 +382,7 @@ function Messages() {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleSendMessage}
-                    className="bg-blue-500 text-white p-2 rounded-r-lg"
+                    className="bg-black text-white p-2 rounded-r-lg hover:bg-white hover:text-black border-1 border-black transition-all cursor-pointer"
                   >
                     Enviar
                   </motion.button>

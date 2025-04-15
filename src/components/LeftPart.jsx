@@ -179,6 +179,7 @@ function LeftPart() {
           )}
         </div>
       </div>
+      {console.log(showMessages)}
       <AnimatePresence>
         {showNotifications && <Notifications />}
         {showFriends && <Friends />}

@@ -1,5 +1,6 @@
 import { queryClient } from "../main.jsx";
 import { useFriends } from "./FriendsContext.jsx";
+import { useMessages } from "./MessagesContext.jsx";
 import { IoCloseOutline } from "react-icons/io5";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useContext, useState, useEffect } from "react";
@@ -25,6 +26,7 @@ const fetchFriendsFn = async (userId) => {
 
 function Friends() {
   const { setShowFriends } = useFriends();
+  const { setShowMessages, setSelectedFriend } = useMessages();
   const { user } = useContext(AuthContext);
   const [pendingFriendRequests, setPendingFriendRequests] = useState([]);
   const [friends, setFriends] = useState([]);
@@ -121,11 +123,22 @@ function Friends() {
     }
   };
 
+  const handleOpenChat = (friend) => {
+    setShowFriends(false);
+    setSelectedFriend(friend);
+    setShowMessages(true);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          setShowFriends(false);
+        }
+      }}
       className="w-full h-screen bg-black/50 absolute z-50 left-0 top-0 flex justify-center items-center"
     >
       <motion.div
@@ -179,7 +192,7 @@ function Friends() {
                     transition={{
                       duration: 0.2,
                       ease: "easeInOut",
-                      delay: 0.3,
+                      delay: 0.3 + index * 0.1,
                     }}
                     key={index}
                     className="w-full min-h-16 flex flex-col"
@@ -264,12 +277,12 @@ function Friends() {
                     transition={{
                       duration: 0.2,
                       ease: "easeInOut",
-                      delay: 0.3,
+                      delay: 0.3 + index * 0.1,
                     }}
                     key={index}
                     className="w-full min-h-16 flex flex-col"
                   >
-                    <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
+                    {/* <div className="w-full min-h-1 rounded-full bg-gray-100"></div> */}
                     <div className="flex bg-white my-3 relative">
                       <button className="cursor-pointer w-20 h-full hover:scale-103 transform transition-all overflow-visible relative z-10">
                         <img
@@ -295,6 +308,19 @@ function Friends() {
                           {friend.user.userPageDescription}
                         </p>
                       </div>
+
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{
+                          duration: 0.2,
+                          ease: "easeOut",
+                        }}
+                        onClick={() => handleOpenChat(friend)}
+                        className="absolute top-1/4 right-5 p-2 text-black border-2 border-black cursor-pointer rounded-lg hover:bg-black hover:text-white transition-all"
+                      >
+                        Mandar Mensagem
+                      </motion.button>
                     </div>
                   </motion.div>
                 </>
