@@ -1,16 +1,20 @@
-import LeftPart from "./LeftPart.jsx";
-import MiddlePart from "./MiddlePart.jsx";
-import RightPart from "./RightPart.jsx";
+import LeftPart from "../components/layout/LeftPart.jsx";
+import MiddlePart from "../components/layout/MiddlePart.jsx";
+import RightPart from "../components/layout/RightPart.jsx";
 
-import { useContext } from "react";
-import { AuthContext } from "./AuthContext.jsx";
+import { useContext, useEffect } from "react";
+import { AuthContext } from "../contexts/AuthContext.jsx";
 import { useNavigate } from "react-router-dom";
 
 function HomePage() {
   const { user, isLoading } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  if (!user && !isLoading) navigate("/login");
+  useEffect(() => {
+    if (!isLoading && !user) {
+      navigate("/login");
+    }
+  }, [isLoading, user, navigate]);
 
   return (
     <div className="flex">

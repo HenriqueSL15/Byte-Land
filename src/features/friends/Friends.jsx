@@ -1,22 +1,21 @@
-import { queryClient } from "../main.jsx";
-import { useFriends } from "./FriendsContext.jsx";
-import { useMessages } from "./MessagesContext.jsx";
+import { queryClient } from "../../main.jsx";
+import { useFriends } from "../../contexts/FriendsContext.jsx";
+import { useMessages } from "../../contexts/MessagesContext.jsx";
 import { IoCloseOutline } from "react-icons/io5";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useContext, useState, useEffect } from "react";
-import { AuthContext } from "./AuthContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
+// Função para buscar a lista de amigos do usuário da API
 const fetchFriendsFn = async (userId) => {
   try {
     const response = await axios.get(
       `http://localhost:3000/users/${userId}/friends`
     );
-
-    console.log(response.data.friends);
 
     return response.data.friends;
   } catch (error) {
@@ -32,6 +31,7 @@ function Friends() {
   const [friends, setFriends] = useState([]);
   const navigate = useNavigate();
 
+  // Função para adicionar notificações ao usuário
   async function addNotificationToOwner(userId, notificationOwner, message) {
     const notificationData = {
       message,
@@ -43,6 +43,7 @@ function Friends() {
       notificationData
     );
 
+    // Invalida a query de notificações para atualizar a UI
     queryClient.invalidateQueries({
       queryKey: ["notifications", userId],
     });
@@ -50,6 +51,7 @@ function Friends() {
     return response.data;
   }
 
+  // Busca a lista de amigos usando React Query
   const {
     data: allFriends,
     isLoadingFriends,
@@ -60,6 +62,7 @@ function Friends() {
     enabled: !!user,
   });
 
+  // Separa amigos em pendentes e aceitos quando os dados são carregados
   useEffect(() => {
     if (allFriends) {
       const pending = allFriends.filter(
@@ -75,8 +78,10 @@ function Friends() {
     }
   }, [allFriends, user._id]);
 
+  // Gerencia a aceitação ou rejeição de solicitações de amizade
   const handleFriendRequestOption = async (userId, friendId, status) => {
     try {
+      // Atualiza o estado local antes da resposta da API para UI responsiva
       if (status === "accepted") {
         if (allFriends) {
           const acceptedFriend = pendingFriendRequests.find(
@@ -98,6 +103,7 @@ function Friends() {
         });
       }
 
+      // Envia a atualização para a API
       const response = await axios.patch(
         `http://localhost:3000/users/${userId}/friends/${friendId}`,
         {
@@ -105,6 +111,7 @@ function Friends() {
         }
       );
 
+      // Adiciona notificação e exibe toast baseado na ação
       if (status === "accepted") {
         addNotificationToOwner(friendId, userId, "Negou seu pedido de amizade");
         toast.success("Pedido de amizade aceito!");
@@ -123,6 +130,7 @@ function Friends() {
     }
   };
 
+  // Abre o chat com um amigo selecionado
   const handleOpenChat = (friend) => {
     setShowFriends(false);
     setSelectedFriend(friend);
@@ -130,6 +138,7 @@ function Friends() {
   };
 
   return (
+    // Modal de fundo com animação
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
@@ -141,6 +150,7 @@ function Friends() {
       }}
       className="w-full h-screen bg-black/50 absolute z-50 left-0 top-0 flex justify-center items-center"
     >
+      {/* Container principal do modal */}
       <motion.div
         initial={{ opacity: 0, scale: 0.98 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -169,6 +179,7 @@ function Friends() {
           />
         </motion.button>
         <div className="flex flex-col gap-5 p-5">
+          {/* Seção de solicitações pendentes */}
           <div>
             <motion.h2
               initial={{ opacity: 0, y: -20 }}
@@ -219,6 +230,7 @@ function Friends() {
                           {friend.user.userPageDescription}
                         </p>
                       </div>
+                      {/* Botões para aceitar ou recusar solicitação */}
                       <div className="flex gap-2 justify-end absolute right-0">
                         <motion.button
                           whileHover={{ scale: 1.05 }}
@@ -255,6 +267,7 @@ function Friends() {
               ))}
             </div>
           </div>
+          {/* Seção de amigos aceitos */}
           <div>
             <motion.h2
               initial={{ opacity: 0, y: -20 }}
@@ -282,33 +295,32 @@ function Friends() {
                     key={index}
                     className="w-full min-h-16 flex flex-col"
                   >
-                    {/* <div className="w-full min-h-1 rounded-full bg-gray-100"></div> */}
                     <div className="flex bg-white my-3 relative">
-                      <button className="cursor-pointer w-20 h-full hover:scale-103 transform transition-all overflow-visible relative z-10">
-                        <img
-                          src={
-                            friend.user.image ==
-                            "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                              ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                              : `http://localhost:3000/${friend.user.image}`
-                          }
-                          alt="Foto do dono da notificação"
-                          className="w-15 h-15 rounded-full"
-                          onClick={() => {
-                            navigate(`/userPage/${friend.user._id}`);
-                            setShowFriends(false);
-                          }}
-                        />
-                      </button>
-                      <div className="flex flex-col gap-1">
-                        <h1 className="text-start text-lg font-semibold font-montserrat">
+                      {/* Imagem do amigo com navegação para perfil */}
+                      <div className="flex gap-2 ml-[5%]">
+                        <button className="cursor-pointer sm:w-8 md:w-12 lg:w-15 h-full hover:scale-103 transform transition-all overflow-visible relative z-10">
+                          <img
+                            src={
+                              friend.user.image ==
+                              "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                                ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                                : `http://localhost:3000/${friend.user.image}`
+                            }
+                            alt="Foto do dono da notificação"
+                            className="w-full h-full rounded-full"
+                            onClick={() => {
+                              navigate(`/userPage/${friend.user._id}`);
+                              setShowFriends(false);
+                            }}
+                          />
+                        </button>
+
+                        <h1 className="text-start flex jusfity-center items-center sm:text-sm md:text-md lg:text-lg font-semibold font-montserrat">
                           {friend.user.name}
                         </h1>
-                        <p className="text-start text-lg font-funnel-sans">
-                          {friend.user.userPageDescription}
-                        </p>
                       </div>
 
+                      {/* Botão para iniciar conversa */}
                       <motion.button
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.9 }}
@@ -317,7 +329,7 @@ function Friends() {
                           ease: "easeOut",
                         }}
                         onClick={() => handleOpenChat(friend)}
-                        className="absolute top-1/4 right-5 p-2 text-black border-2 border-black cursor-pointer rounded-lg hover:bg-black hover:text-white transition-all"
+                        className="absolute md:top-1/6 lg:top-1/4 right-5 p-2 sm:text-xs md:text-sm lg:text-md xl:text-xl text-black border-2 border-black cursor-pointer rounded-lg hover:bg-black hover:text-white transition-all"
                       >
                         Mandar Mensagem
                       </motion.button>

@@ -2,11 +2,12 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence, delay } from "framer-motion";
 
+// Menu lateral para navegação entre opções de configuração
 function LeftMenu({ optionChange }) {
   const navigate = useNavigate();
-
   const [option, setOption] = useState("Perfil do Usuário");
 
+  // Lista de botões de navegação disponíveis no menu
   const buttons = [
     {
       id: 1,
@@ -20,16 +21,9 @@ function LeftMenu({ optionChange }) {
       id: 3,
       text: "Segurança",
     },
-    {
-      id: 4,
-      text: "Preferências",
-    },
-    {
-      id: 5,
-      text: "Notificações",
-    },
   ];
 
+  // Gerencia navegação ou troca de opção quando um botão é clicado
   function handleClick(text) {
     if (text === "Home") {
       navigate("/");
@@ -40,7 +34,7 @@ function LeftMenu({ optionChange }) {
 
   return (
     <div
-      className={`flex flex-col fixed p-10 h-screen text-center w-1/3 border-r-2`}
+      className={`flex flex-col fixed lg:p-4 xl:p-10 h-screen text-center w-1/3 border-r-2`}
     >
       {buttons.map((button) => (
         <motion.button
@@ -55,10 +49,12 @@ function LeftMenu({ optionChange }) {
           key={button.id}
           type="button"
           onClick={() => handleClick(button.text)}
-          className="flex gap-4 p-2 cursor-pointer my-3"
+          className="flex gap-4 p-2 cursor-pointer my-3 "
         >
           {button.icon}
-          <p className="text-2xl font-montserrat font-medium">{button.text}</p>
+          <p className="md:text-lg lg:text-2xl font-montserrat font-medium">
+            {button.text}
+          </p>
         </motion.button>
       ))}
     </div>

@@ -1,11 +1,12 @@
+// Importações necessárias para o componente
 import React, { useContext, useEffect, useState, useRef } from "react";
-import LeftPart from "./LeftPart.jsx";
-import RightPart from "./RightPart.jsx";
+import LeftPart from "../components/layout/LeftPart.jsx";
+import RightPart from "../components/layout/RightPart.jsx";
 import axios from "axios";
-import Publication from "./Publication.jsx";
+import Publication from "../components/publications/Publication.jsx";
 import { CiImageOn } from "react-icons/ci";
 import { IoCloseOutline } from "react-icons/io5";
-import { AuthContext } from "./AuthContext.jsx";
+import { AuthContext } from "../contexts/AuthContext.jsx";
 import { useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,8 +15,9 @@ import { useNavigate } from "react-router-dom";
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
-import LoadingScreen from "./LoadingScreen.jsx";
+import LoadingScreen from "../components/common/LoadingScreen.jsx";
 
+// Função para buscar amigos do usuário
 const fetchFriendsFn = async (userId) => {
   try {
     const response = await axios.get(
@@ -28,6 +30,7 @@ const fetchFriendsFn = async (userId) => {
   }
 };
 
+// Função para buscar dados do usuário
 async function getUserDataFn(userId) {
   const response = await axios.get(
     `http://localhost:3000/users/${userId}/publications`
@@ -36,6 +39,7 @@ async function getUserDataFn(userId) {
   return response.data;
 }
 
+// Função para atualizar dados do usuário
 async function updateUserDataMutationFn({ userId, formData }) {
   const response = await axios.put(
     `http://localhost:3000/users/${userId}/userPage`,
@@ -51,13 +55,17 @@ async function updateUserDataMutationFn({ userId, formData }) {
 }
 
 function UserPage() {
+  // Obtém o ID do usuário da URL
   const { userId } = useParams();
+  // Obtém dados do usuário autenticado e função de login do contexto
   const { user, login, isLoading: isLoadingUser } = useContext(AuthContext);
 
   const navigate = useNavigate();
 
+  // Redireciona para a página de login se não houver usuário autenticado
   if (!user && !isLoadingUser) navigate("/login");
 
+  // Estados para controle da edição de informações
   const [editInfo, setEditInfo] = useState(false);
 
   const fileInputRef = React.useRef(null);
@@ -69,6 +77,7 @@ function UserPage() {
 
   const queryClient = useQueryClient();
 
+  // Busca dados do usuário
   const {
     data: userData,
     isLoading,
@@ -79,6 +88,7 @@ function UserPage() {
     enabled: !!userId,
   });
 
+  // Mutação para atualizar dados do usuário
   const updateUserMutation = useMutation({
     mutationFn: updateUserDataMutationFn,
     onSuccess: () => {
@@ -96,6 +106,7 @@ function UserPage() {
     },
   });
 
+  // Função para remover a imagem selecionada
   const handleDeleteImage = () => {
     setEditedImage(null);
     if (fileInputRef.current) {
@@ -103,6 +114,7 @@ function UserPage() {
     }
   };
 
+  // Função para adicionar notificação ao proprietário
   async function addNotificationToOwner(userId, notificationOwner, message) {
     const notificationData = {
       message,
@@ -129,6 +141,7 @@ function UserPage() {
     }
   };
 
+  // Função para salvar as alterações
   async function handleSaveChanges() {
     const formData = new FormData();
 
@@ -146,6 +159,7 @@ function UserPage() {
     });
   }
 
+  // Função para enviar solicitação de amizade
   const handleSendFriendRequest = async (userId, friendId) => {
     try {
       const response = await axios.post(
@@ -165,6 +179,7 @@ function UserPage() {
     }
   };
 
+  // Função para remover amizade
   const handleRemoveFriend = async (userId, friendId) => {
     try {
       const response = await axios.delete(
@@ -182,6 +197,7 @@ function UserPage() {
     }
   };
 
+  // Busca todos os amigos do usuário
   const {
     data: allFriends,
     isLoadingFriends,
@@ -192,6 +208,7 @@ function UserPage() {
     enabled: !!user,
   });
 
+  // Efeito para verificar se o usuário da página é amigo do usuário autenticado
   useEffect(() => {
     if (!isLoadingFriends && allFriends) {
       setIsFriend(
@@ -202,6 +219,7 @@ function UserPage() {
     }
   }, [isLoadingFriends, allFriends, userId]);
 
+  // Exibe tela de carregamento enquanto os dados são buscados
   if (isLoading) {
     return <LoadingScreen />;
   }
@@ -222,7 +240,7 @@ function UserPage() {
       <div className="w-6/12 border-x-2 border-gray-300 overflow-y-scroll scrollbar-hide relative">
         <div className="h-screen w-full p-5 flex flex-col gap-36 ">
           <div className="relative pb-14">
-            <div className="absolute bg-white bottom-0 left-3 h-32 w-32 rounded-full z-48 border-3 border-white shadow-md overflow-hidden">
+            <div className="absolute bg-white bottom-0 left-3 sm:h-24 sm:w-24 md:h-24 md:w-24 lg:h-32 lg:w-32 rounded-full z-48 border-3 border-white shadow-md overflow-hidden">
               <motion.img
                 initial={{ scale: 1 }}
                 whileHover={{ scale: 1.15 }}
@@ -247,51 +265,53 @@ function UserPage() {
               alt="Imagem do Perfil do Usuário"
               className="rounded-lg w-full h-72 z-40"
             />
-            <div className="absolute left-36 top-[87%] min-w-[590px] max-w-[650px] flex justify-between items-center">
-              <div className="flex flex-col w-[75%]">
-                <h1 className="font-funnel-sans text-2xl mb-1">
-                  {userData.user ? userData.user.name : "Não possui nome"}
-                </h1>
+            <div className="absolute md:left-28 lg:left-36 top-[87%] w-full  md:max-w-[225px] lg:max-w-[325px] xl:max-w-[450px] 2xl:max-w-[550px] items-center">
+              <div className="flex w-full justify-between">
+                <div className="flex flex-col sm:mt-14 sm:ml-2 md:ml-0 md:mt-0">
+                  <h1 className="font-funnel-sans text-2xl mb-1 break-words">
+                    {userData.user ? userData.user.name : "Não possui nome"}
+                  </h1>
 
-                <p className="font-funnel-sans text-lg text-[#979797]">
-                  {userData.user
-                    ? userData.user.userPageDescription
-                    : "Não possui descrição"}
-                </p>
+                  <p className="font-funnel-sans text-lg text-[#979797] sm:max-w-45 md:max-w-35 lg:max-w-50 xl:max-w-70 2xl:max-w-90 break-words">
+                    {userData.user
+                      ? userData.user.userPageDescription
+                      : "Não possui descrição"}
+                  </p>
+                </div>
+                {userData?.user._id === user?._id ? (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="button"
+                    className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full sm:w-20 sm:h-14 sm:text-sm md:w-20 md:h-20 lg:w-40 lg:h-12"
+                    onClick={() => {
+                      setEditInfo(true);
+                    }}
+                  >
+                    Editar Perfil
+                  </motion.button>
+                ) : !isFriend ? (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="button"
+                    className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full sm:w-20 sm:h-14 sm:text-sm md:w-20 md:h-20 lg:w-40 lg:h-12"
+                    onClick={() => handleSendFriendRequest(user._id, userId)}
+                  >
+                    Adicionar Amigo
+                  </motion.button>
+                ) : (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="button"
+                    className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full sm:w-20 sm:text-sm sm:h-14 md:w-20 md:h-20 lg:w-40 lg:h-12"
+                    onClick={() => handleRemoveFriend(user._id, userId)}
+                  >
+                    Desfazer Amizade
+                  </motion.button>
+                )}
               </div>
-              {userData?.user._id === user?._id ? (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
-                  onClick={() => {
-                    setEditInfo(true);
-                  }}
-                >
-                  Editar Perfil
-                </motion.button>
-              ) : !isFriend ? (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
-                  onClick={() => handleSendFriendRequest(user._id, userId)}
-                >
-                  Adicionar Amigo
-                </motion.button>
-              ) : (
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  className="border-2 border-black cursor-pointer font-montserrat font-semibold hover:bg-black hover:text-white transition-all hover:scale-105 transform rounded-full w-40 h-12"
-                  onClick={() => handleRemoveFriend(user._id, userId)}
-                >
-                  Desfazer Amizade
-                </motion.button>
-              )}
             </div>
           </div>
           <div>
@@ -343,7 +363,7 @@ function UserPage() {
                 <motion.button
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
-                  className="absolute right-4 w-14 h-14 cursor-pointer transform hover:scale-110 transition-all"
+                  className="absolute right-4 sm:w-14 md:w-9 md:h-9 lg:w-14 lg:h-14 cursor-pointer transform hover:scale-110 transition-all"
                   onClick={() => setEditInfo(false)}
                 >
                   <IoCloseOutline className="h-full w-full" />
@@ -356,7 +376,7 @@ function UserPage() {
                     ease: "easeInOut",
                     delay: 0.1,
                   }}
-                  className="text-3xl font-semibold font-montserrat mt-3 text-center"
+                  className="text-3xl font-semibold md:text-xl font-montserrat mt-3 text-center"
                 >
                   Editar informações do perfil
                 </motion.h1>

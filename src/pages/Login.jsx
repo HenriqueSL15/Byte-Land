@@ -4,7 +4,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
-import { AuthContext } from "./AuthContext.jsx";
+import { AuthContext } from "../contexts/AuthContext.jsx";
 import { toast } from "sonner";
 
 import axios from "axios";
@@ -13,33 +13,34 @@ import { LuEye } from "react-icons/lu";
 import { LuEyeClosed } from "react-icons/lu";
 
 function Login() {
-  // Navegação
+  // Hook para navegação
   const navigate = useNavigate();
 
-  //Contexto de login
+  // Contexto de autenticação
   const { login } = useContext(AuthContext);
 
-  // Email e verificação de email
+  // Estado e validação do email
   const [email, setEmail] = useState("");
   const isEmailValid = email === "" ? null : validator.isEmail(email);
 
-  // Senhas e verificação das Senhas
+  // Estados para senha e visibilidade
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Alteração do Email
+  // Função para atualizar o email
   function handleEmailChange(event) {
     setEmail(event.value);
   }
 
-  // Alteração das Senhas
+  // Função para atualizar a senha
   function handlePasswordChange(event) {
     setPassword(event.value);
   }
 
-  //Envio do formulário de Login
+  // Função assíncrona para enviar o formulário de login
   async function handleLoginSubmit() {
     try {
+      // Requisição POST para o servidor
       const response = await axios.post(
         "http://localhost:3000/login",
         {
@@ -53,6 +54,7 @@ function Login() {
         }
       );
 
+      // Se a resposta for bem-sucedida
       if (response.status == 200) {
         login(response.data.user);
         console.log("Login realizado com sucesso!");
@@ -61,7 +63,6 @@ function Login() {
       }
     } catch (error) {
       console.log(error);
-
       toast.error("Email ou senha incorretos!");
     }
     console.log(`Email: ${email}\nSenha: ${password}`);
@@ -72,7 +73,7 @@ function Login() {
       <div className="flex flex-col w-4/10 min-h-3/6 shadow-lg text-center overflow-y-auto">
         <h1 className="text-3xl p-3 font-montserrat font-semibold">Login</h1>
         <div className="flex flex-col p-5 gap-7">
-          {/* Label e Input do Email */}
+          {/* Campo de entrada para o email */}
           <div className="flex flex-col text-start gap-2">
             <label
               htmlFor=""
@@ -100,7 +101,7 @@ function Login() {
             />
           </div>
 
-          {/* Label e Input da Senha */}
+          {/* Campo de entrada para a senha */}
           <div className="flex flex-col text-start gap-2">
             <label
               htmlFor=""
@@ -121,6 +122,7 @@ function Login() {
                  focus:outline-none focus:scale-101 transition-all
               `}
               />
+              {/* Botão para mostrar/ocultar senha */}
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
@@ -135,15 +137,14 @@ function Login() {
             </div>
           </div>
 
-          {/* Botão de Continuar */}
+          {/* Botão de login e links adicionais */}
           <div className="flex items-center justify-center flex-col gap-3">
             <button
               type="button"
-              // Verificação para alterar os estilos com base no preenchimento de todas as informações do formulário
-              className={`w-1/3 cursor-not-allowed text-xl font-poppins font-semibold rounded-lg p-1 ${
+              className={`lg:w-1/3 cursor-not-allowed text-xl font-poppins font-semibold rounded-lg p-1 ${
                 isEmailValid && password != ""
-                  ? "border-2 border-green-500  cursor-pointer"
-                  : "border-2 border-red-500  cursor-not-allowed"
+                  ? "border-2 border-green-500 cursor-pointer"
+                  : "border-2 border-red-500 cursor-not-allowed"
               } hover:scale-105 transition-all`}
               onClick={() => {
                 if (isEmailValid && password != "") {
@@ -163,12 +164,6 @@ function Login() {
                 className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
               >
                 Você não possui uma conta?
-              </Link>
-              <Link
-                to="/"
-                className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
-              >
-                Quer voltar a tela principal?
               </Link>
             </div>
           </div>

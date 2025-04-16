@@ -4,17 +4,19 @@ import axios from "axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
-import { AuthContext } from "./AuthContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+// Função assíncrona para criar uma nova publicação
+// Envia os dados do formulário para a API usando multipart/form-data
 const createPublication = async (formData) => {
   const response = await axios.post(
     "http://localhost:3000/publications",
     formData,
     {
       headers: {
-        "Content-Type": "multipart/form-data", // Usado para enviar arquivos
+        "Content-Type": "multipart/form-data", // Necessário para enviar arquivos
       },
     }
   );
@@ -23,22 +25,29 @@ const createPublication = async (formData) => {
 };
 
 function NewPublicationBox() {
+  // Referência para o input de arquivo para manipulação direta do DOM
   const inputRef = useRef(null);
 
+  // Estados para armazenar os dados do formulário
   const [image, setImage] = useState(null);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
+  // Limites de caracteres para os campos
   const titleLimit = 100;
   const descriptionLimit = 500;
 
+  // Cliente de consulta para gerenciar o cache do React Query
   const queryClient = useQueryClient();
 
+  // Hook de mutação para criar uma nova publicação
   const mutation = useMutation({
     mutationFn: createPublication,
     onSuccess: () => {
+      // Invalida a consulta de publicações para forçar uma nova busca
       queryClient.invalidateQueries({ queryKey: ["publications"] });
 
+      // Feedback visual e reset do formulário
       toast.success("Publicação criada com sucesso!");
       setTitle("");
       setDescription("");
@@ -50,8 +59,10 @@ function NewPublicationBox() {
     },
   });
 
+  // Obtém dados do usuário atual do contexto de autenticação
   const { user } = useContext(AuthContext);
 
+  // Manipula a seleção de imagem
   const handleImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
@@ -59,27 +70,32 @@ function NewPublicationBox() {
     }
   };
 
+  // Remove a imagem selecionada
   const removeImage = () => {
     setImage(null);
     if (inputRef.current) {
-      inputRef.current.value = "";
+      inputRef.current.value = ""; // Limpa o input de arquivo
     }
   };
 
+  // Manipula o envio da publicação
   const handleSubmitPublication = async () => {
+    // Validação básica
     if (!title || !description) {
       toast.error("Preencha todos os campos!");
       return;
     }
 
+    // Cria um objeto FormData para enviar dados multipart
     const formData = new FormData();
-    formData.append("owner", user._id); //Alterar par ao ID
+    formData.append("owner", user._id);
     formData.append("title", title);
     formData.append("description", description);
     if (image) {
-      formData.append("image", image ? image : null); // Adiciona o arquivo de imagem
+      formData.append("image", image);
     }
 
+    // Executa a mutação com os dados do formulário
     mutation.mutate(formData);
   };
 
@@ -95,6 +111,7 @@ function NewPublicationBox() {
       className={`flex items-center justify-center mb-10 z-10`}
     >
       <div className="w-9/10 shadow-lg rounded-lg my-5">
+        {/* Cabeçalho com informações do usuário */}
         <div className="m-5 mb-5 flex items-center gap-2">
           <img
             src={
@@ -114,10 +131,11 @@ function NewPublicationBox() {
         </div>
         <div className="m-5 flex flex-col justify-center">
           <div className="flex flex-col items-center">
+            {/* Campo de título com contador de caracteres */}
             <div className="w-full relative">
               <input
                 type="text"
-                className={`text-2xl mb-3 px-2 pt-2 pb-0 border-b-1 w-full font-montserrat focus:outline-none focus:border-b-2`}
+                className={`md:text-2xl mb-3 px-2 pt-2 pb-0 border-b-1 w-full font-montserrat focus:outline-none focus:border-b-2`}
                 placeholder="Título da publicação"
                 value={title}
                 onChange={(e) => {
@@ -134,6 +152,7 @@ function NewPublicationBox() {
                 {title.length}/{titleLimit}
               </h2>
             </div>
+            {/* Campo de descrição com contador de caracteres */}
             <div className="w-full relative">
               <textarea
                 className="text-base text-gray-800 w-full font-funnel-sans mb-5 overflow-y-scroll scrollbar-hide h-[200px] p-2 border-1 border-gray-500 rounded-lg"
@@ -146,7 +165,7 @@ function NewPublicationBox() {
                 }}
               />
               <h2
-                className={`text-[15px] select-none absolute right-2 bottom-7   ${
+                className={`text-[15px] select-none absolute right-2 bottom-7 ${
                   description.length == descriptionLimit && "text-red-500"
                 } `}
               >
@@ -155,7 +174,7 @@ function NewPublicationBox() {
             </div>
           </div>
           <div>
-            {/* Exibe a imagem selecionada */}
+            {/* Exibe a imagem selecionada com animação */}
             <AnimatePresence>
               {image && (
                 <motion.img
@@ -168,7 +187,7 @@ function NewPublicationBox() {
                   }}
                   src={URL.createObjectURL(image)}
                   alt="Imagem selecionada"
-                  className="max-h-60 w-auto mx-auto object-contain mb-5 rounded-lg "
+                  className="max-h-60 w-auto mx-auto object-contain mb-5 rounded-lg"
                 />
               )}
             </AnimatePresence>
@@ -190,12 +209,12 @@ function NewPublicationBox() {
                 />
               </motion.label>
 
-              {/* Botão para apagar imagem */}
+              {/* Botão para apagar imagem (só aparece quando há uma imagem) */}
               {image && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="text-black h-1/2 font-bold w-1/4 py-2 px-4 rounded-full text-center p-3  font-poppins text-md border-2 cursor-pointer hover:bg-gray-100 hover:text-gray-900"
+                  className="text-black lg:h-1/2 font-bold lg:w-1/4 lg:py-2 lg:px-4 rounded-full text-center p-3 font-poppins text-md border-2 cursor-pointer hover:bg-gray-100 hover:text-gray-900"
                   onClick={removeImage}
                 >
                   Delete Image
@@ -203,13 +222,13 @@ function NewPublicationBox() {
               )}
             </motion.div>
 
-            {/* Botão de enviar */}
+            {/* Botão de enviar publicação */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               type="button"
               onClick={handleSubmitPublication}
-              className="mt-5 text-center w-2/6 p-3 rounded-lg h-full border-2 font-poppins font-semibold text-xl cursor-pointer hover:bg-gray-100 hover:text-gray-900"
+              className="mt-5 text-center sm:p-2 lg:w-2/6 lg:p-3 rounded-lg lg:h-full border-2 font-poppins font-semibold text-xl cursor-pointer hover:bg-gray-100 hover:text-gray-900"
             >
               Enviar Publicação
             </motion.button>

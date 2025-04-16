@@ -1,31 +1,31 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { useMessages } from "./MessagesContext.jsx";
+import { useMessages } from "../../contexts/MessagesContext.jsx";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { AuthContext } from "./AuthContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 import axios from "axios";
 import { useState, useContext, useEffect, useRef } from "react";
 import { IoCloseOutline, IoArrowBackOutline } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
+// Busca a lista de amigos do usuário
 const fetchFriendsFn = async (userId) => {
   try {
     const response = await axios.get(
       `http://localhost:3000/users/${userId}/friends`
     );
-
     return response.data.friends;
   } catch (error) {
     console.error(error);
   }
 };
 
+// Busca mensagens de uma conversa específica
 const fetchConversationMessages = async ({ queryKey }) => {
   const [_, userId, friendId] = queryKey;
   try {
     const response = await axios.get(
       `http://localhost:3000/conversation/${userId}/${friendId}`
     );
-
     return response.data;
   } catch (error) {
     console.error(error);
@@ -33,6 +33,7 @@ const fetchConversationMessages = async ({ queryKey }) => {
   }
 };
 
+// Envia uma nova mensagem para a conversa
 const sendMessage = async (conversationId, senderId, content) => {
   try {
     const response = await axios.post(
@@ -53,14 +54,14 @@ function Messages() {
   const [messages, setMessages] = useState([]);
   const [currentConversation, setCurrentConversation] = useState(null);
   const [messageInput, setMessageInput] = useState("");
-
   const messagesEndRef = useRef(null);
-
   const [friends, setFriends] = useState([]);
+
   const queryClient = useQueryClient();
   const { user } = useContext(AuthContext);
   const navigate = useNavigate();
 
+  // Adiciona notificação para o destinatário
   async function addNotificationToOwner(userId, notificationOwner, message) {
     const notificationData = {
       message,
@@ -79,6 +80,7 @@ function Messages() {
     return response.data;
   }
 
+  // Busca lista de amigos
   const {
     data: allFriends,
     isLoadingFriends,
@@ -89,6 +91,7 @@ function Messages() {
     enabled: !!user,
   });
 
+  // Busca mensagens da conversa atual
   const { data: conversationData, isLoadingConversationData } = useQuery({
     queryKey: ["conversation", user?._id, selectedFriend?.user?._id],
     queryFn: fetchConversationMessages,
@@ -96,6 +99,7 @@ function Messages() {
     refetchInterval: 3000, // Refetch a cada 3 segundos
   });
 
+  // Atualiza mensagens quando os dados da conversa mudam
   useEffect(() => {
     if (conversationData) {
       if (conversationData.messages) {
@@ -110,24 +114,25 @@ function Messages() {
     }
   }, [conversationData]);
 
+  // Filtra amigos aceitos
   useEffect(() => {
     if (allFriends) {
       const accepted = allFriends.filter(
         (friend) => friend.status === "accepted"
       );
-
       setFriends(accepted);
     }
   }, [allFriends]);
 
+  // Abre o chat com um amigo
   const handleOpenChat = async (friend, event) => {
     if (event) {
       event.stopPropagation();
     }
-
     setSelectedFriend(friend);
   };
 
+  // Envia uma nova mensagem
   const handleSendMessage = async () => {
     if (!messageInput.trim() || !currentConversation) return;
 
@@ -139,7 +144,7 @@ function Messages() {
       );
 
       if (newMessage) {
-        // Adicione a mensagem localmente para feedback imediato
+        // Feedback imediato
         setMessages((prevMessages) => [...prevMessages, newMessage]);
         setMessageInput("");
 
@@ -149,7 +154,7 @@ function Messages() {
           "Mandou uma mensagem para você!"
         );
 
-        // Invalide a query para forçar uma atualização
+        // Atualiza dados
         queryClient.invalidateQueries([
           "conversation",
           user._id,
@@ -165,6 +170,7 @@ function Messages() {
     }
   };
 
+  // Envia mensagem ao pressionar Enter
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -172,6 +178,7 @@ function Messages() {
     }
   };
 
+  // Rola para o final da conversa
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
@@ -180,7 +187,7 @@ function Messages() {
     scrollToBottom();
   }, [messages]);
 
-  // Função de fechamento modificada
+  // Fecha o modal de mensagens
   const handleClose = () => {
     setShowMessages(false);
     setSelectedFriend(null);
@@ -218,12 +225,13 @@ function Messages() {
             e.stopPropagation();
             handleClose();
           }}
-          className="w-16 h-20 absolute top-0 right-2"
+          className="md:w-10 md:h-10 xl:w-16 xl:h-20 absolute top-0 right-2"
         >
           <IoCloseOutline className="w-full h-full cursor-pointer" />
         </motion.div>
         <AnimatePresence mode="wait">
           {!selectedFriend ? (
+            // Lista de amigos
             <motion.div
               className="flex flex-col gap-7"
               key={"friendList"}
@@ -235,7 +243,7 @@ function Messages() {
               <motion.h1
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="p-5 text-3xl font-funnel-sans"
+                className="plg:p-5 md:p-1 md:text-2xl lg:text-3xl font-funnel-sans"
               >
                 Mensagens
               </motion.h1>
@@ -251,7 +259,7 @@ function Messages() {
                       delay: 0.2,
                     }}
                     key={friend.user._id}
-                    className="flex gap-3 mx-3"
+                    className="flex smd:gap-1 lg:gap-3 mx-3"
                   >
                     <motion.img
                       whileHover={{ scale: 1.05 }}
@@ -263,7 +271,7 @@ function Messages() {
                         setSelectedFriend(null);
                         navigate(`/userPage/${friend.user._id}`);
                       }}
-                      className="cursor-pointer w-14 h-14 rounded-full object-cover"
+                      className="cursor-pointer sm:w-10 sm:h-10 lg:w-14 lg:h-14 rounded-full object-cover"
                       src={
                         friend.user.image ==
                         "https://cdn-icons-png.flaticon.com/512/711/711769.png"
@@ -274,7 +282,7 @@ function Messages() {
                     />
 
                     <div className="flex flex-col justify-center">
-                      <h1 className="text-xl font-funnel-sans">
+                      <h1 className="lg:text-lg xl:text-xl font-funnel-sans">
                         {friend.user.name}
                       </h1>
                     </div>
@@ -283,7 +291,7 @@ function Messages() {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={(e) => handleOpenChat(friend, e)}
-                        className="w-[150px] h-3/4 bg-white border-2 border-black rounded-lg text-md mr-3 font-poppins cursor-pointer"
+                        className="sm:text-xs sm:px-1 md:w-[100px] lg:w-[100px] xl:w-[150px] h-3/4 bg-white border-2 border-black rounded-lg text-md mr-3 font-poppins cursor-pointer"
                       >
                         Abrir Chat
                       </motion.button>
@@ -299,6 +307,7 @@ function Messages() {
               )}
             </motion.div>
           ) : (
+            // Tela de chat
             <motion.div
               key="chatView"
               initial={{ x: "100%" }}
@@ -348,10 +357,10 @@ function Messages() {
                       }`}
                     >
                       <div
-                        className={`max-w-[70%] p-3 rounded-lg ${
+                        className={`max-w-[70%] break-words p-3 rounded-lg ${
                           msg.sender._id === user._id || msg.sender === user._id
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-200"
+                            ? "bg-blue-500 text-white text-end"
+                            : "bg-gray-200 text-start"
                         }`}
                       >
                         {msg.content}
@@ -368,21 +377,21 @@ function Messages() {
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className="p-4 border-t">
-                <div className="flex">
+              <div className="sm:p-1 md:p-4 border-t">
+                <div className="flex ">
                   <input
                     type="text"
                     value={messageInput}
                     onChange={(e) => setMessageInput(e.target.value)}
                     onKeyPress={handleKeyPress}
                     placeholder="Digite sua mensagem..."
-                    className="flex-grow p-2 border rounded-l-lg focus:outline-none"
+                    className="flex-grow p-2 border rounded-l-lg sm:text-sm sm:max-w-[75%] md:text-sm lg:text-xl focus:outline-none md:max-w-[75%] lg:max-w-[90%]"
                   />
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={handleSendMessage}
-                    className="bg-black text-white p-2 rounded-r-lg hover:bg-white hover:text-black border-1 border-black transition-all cursor-pointer"
+                    className="bg-black text-white sm:p-1 md:p-2 rounded-r-lg hover:bg-white hover:text-black border-1 border-black transition-all cursor-pointer"
                   >
                     Enviar
                   </motion.button>

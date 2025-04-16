@@ -1,26 +1,31 @@
+// Importações de ícones e componentes
 import { FaTrashCan } from "react-icons/fa6";
-import { AuthContext } from "./AuthContext.jsx";
+import { AuthContext } from "../../contexts/AuthContext.jsx";
 import { FaPencilAlt } from "react-icons/fa";
 import { IoCloseOutline } from "react-icons/io5";
 import { IoSend } from "react-icons/io5";
 import { CiImageOn } from "react-icons/ci";
+// Hooks do React
 import { useContext, useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import LoadingScreen from "./LoadingScreen.jsx";
-import { toast } from "sonner";
+import LoadingScreen from "../common/LoadingScreen.jsx";
+import { toast } from "sonner"; // Biblioteca para notificações toast
+// Hooks do React Query para gerenciamento de estado e requisições
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-
+// Biblioteca para animações
 import { motion, AnimatePresence } from "framer-motion";
-
+// Cliente HTTP
 import axios from "axios";
 
+// Função para buscar comentários de uma publicação
 const fetchComments = async (publicationId) => {
   const { data } = await axios.get(
     `http://localhost:3000/publications/${publicationId}/comments`
   );
-  return data.comments.reverse();
+  return data.comments.reverse(); // Inverte a ordem para mostrar os mais recentes primeiro
 };
 
+// Função para adicionar um comentário a uma publicação
 const addCommentMutationFn = async (commentData) => {
   const response = await axios.post(
     `http://localhost:3000/publications/${commentData.id}/comments`,
@@ -35,6 +40,7 @@ const addCommentMutationFn = async (commentData) => {
   return response.data;
 };
 
+// Função para deletar um comentário
 const deleteCommentMutationFn = async (data) => {
   console.log(data);
   const response = await axios.delete(
@@ -44,6 +50,7 @@ const deleteCommentMutationFn = async (data) => {
   return response.data;
 };
 
+// Função para deletar uma publicação
 const deletePublicationMutationFn = async (data) => {
   console.log(data);
   const response = await axios.delete(
@@ -53,6 +60,7 @@ const deletePublicationMutationFn = async (data) => {
   return response.data;
 };
 
+// Função para editar uma publicação
 const editPublicationMutationFn = async ({ publicationId, formData }) => {
   console.log(publicationId);
   console.log(formData);
@@ -61,7 +69,7 @@ const editPublicationMutationFn = async ({ publicationId, formData }) => {
     formData,
     {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": "multipart/form-data", // Necessário para envio de arquivos
       },
     }
   );
@@ -69,20 +77,23 @@ const editPublicationMutationFn = async ({ publicationId, formData }) => {
   return response.data;
 };
 
+// Componente principal de Publicação
 function Publication({ id, isOwner, owner, date, title, description, image }) {
   const navigate = useNavigate();
 
-  // Contexto do usuário
+  // Obtém dados do usuário logado do contexto de autenticação
   const { user } = useContext(AuthContext);
 
+  // Limite de caracteres para comentários
   const newCommentLimit = 125;
 
+  // Referência para o input de imagem
   const inputRef = useRef(null);
 
   // Estado para armazenar novos comentários
   const [newComment, setNewComment] = useState("");
 
-  // Estado sobre as edições feitas
+  // Estados para gerenciar edições na publicação
   const [editedTitle, setEditedTitle] = useState(title); // Inicializa com o título original
   const [editedDescription, setEditedDescription] = useState(description); // Inicializa com a descrição original
   const [editedImage, setEditedImage] = useState(() => {
@@ -90,14 +101,17 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     return typeof image === "string" ? "EXISTING_IMAGE" : null;
   });
 
-  // Estado para alterar a exibição do botão para um form
+  // Estado para controlar o modo de edição
   const [edit, setEdit] = useState(false);
 
+  // Limites de caracteres para título e descrição
   const titleLimit = 100;
   const descriptionLimit = 500;
 
+  // Cliente de consulta do React Query
   const queryClient = useQueryClient();
 
+  // Consulta para buscar comentários
   const {
     data: comments,
     isLoadingComments,
@@ -105,18 +119,23 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
   } = useQuery({
     queryKey: ["comments", id],
     queryFn: () => fetchComments(id),
-    enabled: !!id,
+    enabled: !!id, // Só executa se houver um ID válido
   });
 
+  // Mutação para adicionar comentários
   const addCommentMutation = useMutation({
     mutationFn: addCommentMutationFn,
     onSuccess: () => {
+      // Invalida a consulta de comentários para forçar uma nova busca
       queryClient.invalidateQueries({ queryKey: ["comments", id] });
 
+      // Limpa o campo de comentário
       setNewComment("");
 
+      // Exibe notificação de sucesso
       toast.success("Comentário adicionado com sucesso!");
 
+      // Adiciona notificação para o dono da publicação (se não for o próprio usuário)
       if (owner._id !== user._id) {
         addNotificationToOwner(
           owner._id,
@@ -127,16 +146,16 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     },
     onError: (error) => {
       console.error("Erro ao adicionar o comentário:", error);
-
       toast.error("Erro ao adicionar comentário. Tente novamente.");
     },
   });
 
+  // Mutação para deletar comentários
   const deleteCommentMutation = useMutation({
     mutationFn: deleteCommentMutationFn,
     onSuccess: () => {
+      // Invalida a consulta de comentários para forçar uma nova busca
       queryClient.invalidateQueries({ queryKey: ["comments", id] });
-
       toast.success("Comentário deletado com sucesso!");
     },
     onError: (error) => {
@@ -145,20 +164,22 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     },
   });
 
+  // Mutação para deletar publicações
   const deletePublicationMutation = useMutation({
     mutationFn: deletePublicationMutationFn,
     onSuccess: () => {
+      // Invalida consultas relacionadas para atualizar a UI
       queryClient.invalidateQueries({ queryKey: ["publications"] });
-
+      queryClient.invalidateQueries(["userPageData", owner._id]);
       toast.success("Publicação deletada com sucesso!");
     },
     onError: (error) => {
       console.error("Erro ao deletar a publicação:", error);
-
       toast.error("Erro ao deletar publicação. Tente novamente.");
     },
   });
 
+  // Função para adicionar notificação ao dono da publicação
   async function addNotificationToOwner(
     publicationOwner,
     notificationOwner,
@@ -174,6 +195,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
       notificationData
     );
 
+    // Invalida a consulta de notificações para atualizar a UI
     queryClient.invalidateQueries({
       queryKey: ["notifications", publicationOwner],
     });
@@ -181,23 +203,23 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     return response.data;
   }
 
+  // Mutação para editar publicações
   const editPublicationMutation = useMutation({
     mutationFn: editPublicationMutationFn,
     onSuccess: () => {
+      // Invalida a consulta de publicações para forçar uma nova busca
       queryClient.invalidateQueries({ queryKey: ["publications"] });
-
+      // Sai do modo de edição
       setEdit(false);
-
       toast.success("Publicação editada com sucesso!");
     },
     onError: (error) => {
       console.error("Erro ao editar a publicação:", error);
-
       toast.error("Erro ao editar a publicação. Tente novamente");
     },
   });
 
-  // Função para alterar a imagem
+  // Função para alterar a imagem da publicação
   const handleImageChange = (event) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
@@ -217,7 +239,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
 
   // Função para editar a publicação
   async function handleEditPublication() {
-    // Verifica se houve alterações
+    // Verifica se houve alterações antes de enviar
     const hasChanges =
       editedTitle !== title ||
       editedDescription !== description ||
@@ -228,18 +250,20 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
       return; // Sai da função se não houver alterações
     }
 
+    // Prepara os dados para envio
     const formData = new FormData();
-
     formData.append("owner", owner._id);
     formData.append("title", editedTitle);
     formData.append("description", editedDescription);
 
+    // Trata a imagem de acordo com o estado
     if (editedImage instanceof Blob) {
       formData.append("image", editedImage);
     } else if (editedImage === null) {
       formData.append("image", null);
     }
 
+    // Executa a mutação de edição
     editPublicationMutation.mutate({ publicationId: id, formData: formData });
   }
 
@@ -264,6 +288,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     addCommentMutation.mutate(commentData);
   }
 
+  // Função para remover a imagem da publicação durante edição
   const removeImage = () => {
     setEditedImage(null);
     if (inputRef.current) {
@@ -271,13 +296,16 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     }
   };
 
+  // Normaliza caminhos de imagem substituindo barras invertidas
   if (typeof image == "string") image.replaceAll("\\", "/");
 
+  // Atualiza os estados de edição quando as props mudam
   useEffect(() => {
     setEditedTitle(title);
     setEditedDescription(description);
   }, [title, description]); // ← Dependências das props
 
+  // Exibe tela de carregamento enquanto os comentários estão sendo buscados
   if (isLoadingComments) {
     return <LoadingScreen />;
   }
@@ -319,7 +347,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                 <h1 className="text-2xl text-start font-poppins font-medium">
                   {owner.name}
                 </h1>
-                <h2 className="text-sm text-gray-600 font-poppins">
+                <h2 className="md:text-sm text-gray-600 font-poppins">
                   {new Date(date).toLocaleString("pt-BR")}
                 </h2>
               </div>
@@ -364,8 +392,8 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   className="font-bold py-2 px-4 rounded-full bg-white border-2 cursor-pointer hover:scale-103 hover:bg-black hover:text-white hover:border-2 transition-all"
                   onClick={() => {
                     setEdit(true);
-                    setEditedTitle(title); // ← Atualiza com valor atual
-                    setEditedDescription(description); // ← Atualiza com valor atual
+                    setEditedTitle(title);
+                    setEditedDescription(description);
                   }}
                 >
                   <FaPencilAlt className="w-5 h-5" />
@@ -403,7 +431,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                     <div className="relative w-full">
                       <textarea
                         placeholder="Escreva seu comentário"
-                        className="border-2 border-gray-200 w-full overflow-y-auto min-h-[50px] rounded-sm min-w-[500px] p-1 font-poppins"
+                        className="sm:text-sm lg:text-xl border-2 border-gray-200 w-full overflow-y-auto min-h-[50px] rounded-sm p-1 font-poppins"
                         onChange={(e) => {
                           if (e.target.value.length <= newCommentLimit) {
                             setNewComment(e.target.value);
@@ -439,7 +467,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                           onClick={() =>
                             navigate(`/userPage/${element.owner?._id}`)
                           } // Check if owner exists
-                          className="flex cursor-pointer"
+                          className="flex cursor-pointer sm:max-w-[25%] md:max-w-[20%] xl:max-w-[55%] 2xl:max-w-[75%]"
                         >
                           <img
                             src={
@@ -452,13 +480,13 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                             alt="Foto da pessoa"
                             className="w-10 h-10 rounded-full"
                           />
-                          <div className="flex flex-col pl-2">
+                          <div className="flex flex-col pl-2  ">
                             <h1 className="font-poppins font-medium text-start">
                               {element.owner
                                 ? element.owner.name
                                 : "Unknown User"}
                             </h1>
-                            <p className="text-start w-[450px] break-words">
+                            <p className="text-start sm:max-w-[11%] md:max-w-[20%] lg:max-w-[37%] xl:max-w-[55%] 2xl:max-w-[75%]  break-words">
                               {element.comment}
                             </p>
                           </div>
@@ -467,7 +495,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                           element.owner &&
                           user.name == element.owner.name && (
                             <button
-                              className="cursor-pointer w-10 h-full flex justify-end"
+                              className="cursor-pointer w-10 h-full flex justify-end max-w-[25%]"
                               onClick={() => deleteComment(id, element._id)}
                             >
                               <IoCloseOutline className="w-10 h-10" />

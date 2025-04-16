@@ -1,16 +1,12 @@
-// Biblioteca para validar emails
+// Importação de bibliotecas e componentes necessários
 import validator from "validator";
 import React, { useState, useEffect, useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { AuthContext } from "./AuthContext.jsx";
-
+import { AuthContext } from "../contexts/AuthContext.jsx";
 import axios from "axios";
 import PasswordValidator from "password-validator";
-
 import { toast } from "sonner";
-
-import { LuEye } from "react-icons/lu";
-import { LuEyeClosed } from "react-icons/lu";
+import { LuEye, LuEyeClosed } from "react-icons/lu";
 
 function SignUp() {
   const navigate = useNavigate();
@@ -18,16 +14,24 @@ function SignUp() {
   // Contexto de autenticação
   const { login } = useContext(AuthContext);
 
-  // Usuário
+  // Estados para armazenar dados do formulário
   const [user, setUser] = useState("");
-
-  // Email e verificação de email
   const [email, setEmail] = useState("");
-  const isEmailValid = email === "" ? null : validator.isEmail(email);
-
-  // Senhas e verificação das Senhas
   const [password1, setPassword1] = useState("");
   const [password2, setPassword2] = useState("");
+
+  // Estados para controle de visibilidade da senha
+  const [showPassword1, setShowPassword1] = useState(false);
+  const [showPassword2, setShowPassword2] = useState(false);
+
+  // Estados para validação
+  const [errors, setErrors] = useState([]);
+  const [isInitial, setIsInitial] = useState(true);
+
+  // Validação de email
+  const isEmailValid = email === "" ? null : validator.isEmail(email);
+
+  // Validação de senha
   const isPasswordValid =
     password1 == "" && password2 == ""
       ? null
@@ -35,12 +39,7 @@ function SignUp() {
       ? true
       : false;
 
-  const [showPassword1, setShowPassword1] = useState(false);
-  const [showPassword2, setShowPassword2] = useState(false);
-
-  const [errors, setErrors] = useState([]);
-  const [isInitial, setIsInitial] = useState(true);
-
+  // Lista de regras para senha
   const typeOfErrors = [
     { text: "Pelo menos 8 caracteres", name: "min" },
     { text: "Pelo menos 1 caractere maiúsculo", name: "uppercase" },
@@ -50,8 +49,8 @@ function SignUp() {
     { text: "Sem nenhum espaço", name: "spaces" },
   ];
 
+  // Configuração do esquema de validação de senha
   const schema = new PasswordValidator();
-
   schema
     .is()
     .min(8)
@@ -67,41 +66,39 @@ function SignUp() {
     .not()
     .spaces();
 
+  // Efeito para validar a senha quando ela é alterada
   useEffect(() => {
     if (password1) {
       const validationErrors = schema.validate(password1, { details: true });
       setErrors(validationErrors);
       setIsInitial(false);
     } else {
-      setErrors([]); // Limpa os erros se o campo estiver vazio
+      setErrors([]);
       setIsInitial(true);
     }
     console.log(errors);
   }, [password1]);
 
-  // Verifica se uma regra está presente nos erros
+  // Função para verificar se uma regra específica está nos erros
   function isRuleError(ruleName) {
     return errors.some((error) => error.validation === ruleName);
   }
 
-  // Alteração do Usuário
+  // Funções para lidar com mudanças nos campos do formulário
   function handleUserChange(event) {
     setUser(event.value);
   }
 
-  // Alteração do Email
   function handleEmailChange(event) {
     setEmail(event.value);
   }
 
-  // Alteração das Senhas
   function handlePasswordChange(event) {
-    // Determina qual é a senha com base no atributo ID do elemento
     if (event.id == "password1") setPassword1(event.value);
     else if (event.id == "password2") setPassword2(event.value);
   }
 
-  //Envio do formulário de Login
+  // Função para enviar o formulário de cadastro
   async function handleSignUpSubmit() {
     try {
       const response = await axios.post(
@@ -123,7 +120,6 @@ function SignUp() {
         response.status == 200 &&
         response.data.message == "Usuário criado com sucesso!"
       ) {
-        // login(response.data.user);
         navigate("/login");
         toast.success("Usuário criado com sucesso!");
       } else if (response.status == 200) {
@@ -143,7 +139,7 @@ function SignUp() {
       >
         <h1 className="text-3xl p-3 font-montserrat font-semibold">Sign Up</h1>
         <div className="flex flex-col p-5 gap-7">
-          {/* Label e Input do usuário */}
+          {/* Campo de entrada para o usuário */}
           <div className="flex flex-col text-start gap-2">
             <label
               htmlFor=""
@@ -161,7 +157,7 @@ function SignUp() {
             />
           </div>
 
-          {/* Label e Input do Email */}
+          {/* Campo de entrada para o email */}
           <div className="flex flex-col text-start gap-2">
             <label
               htmlFor=""
@@ -179,17 +175,17 @@ function SignUp() {
                 w-full px-2 py-1 rounded-lg border border-gray-300
                 ${
                   isEmailValid === null
-                    ? "border-gray-300 focus:border-gray-500" // Cor padrão (cinza) quando o campo está vazio
+                    ? "border-gray-300 focus:border-gray-500"
                     : isEmailValid
-                    ? "border-green-500 focus:border-green-500" // Verde se o email for válido
-                    : "border-red-500 focus:border-red-500" // Vermelho se o email for inválido
+                    ? "border-green-500 focus:border-green-500"
+                    : "border-red-500 focus:border-red-500"
                 }
                  focus:outline-none focus:scale-101 transition-all
               `}
             />
           </div>
 
-          {/* Label e Input da Senha */}
+          {/* Campo de entrada para a senha */}
           <div className="flex flex-col text-start gap-2">
             <label
               htmlFor=""
@@ -229,6 +225,7 @@ function SignUp() {
                 )}
               </button>
             </div>
+            {/* Exibição das regras de senha */}
             <div className="font-funnel-sans ml-1 flex flex-col gap-1 mt-1">
               {typeOfErrors.map((rule) => (
                 <p
@@ -246,7 +243,7 @@ function SignUp() {
             </div>
           </div>
 
-          {/* Label e Input da Confirmação de Senha */}
+          {/* Campo de entrada para confirmação de senha */}
           <div className="flex flex-col text-start gap-2">
             <label
               htmlFor=""
@@ -266,10 +263,10 @@ function SignUp() {
                 w-full px-2 py-1 rounded-lg border border-gray-300
                 ${
                   isPasswordValid === null
-                    ? "border-gray-300 focus:border-gray-500" // Cor padrão (cinza) quando o campo está vazio
+                    ? "border-gray-300 focus:border-gray-500"
                     : isPasswordValid
-                    ? "border-green-500 focus:border-green-500" // Verde se o email for válido
-                    : "border-red-500 focus:border-red-500" // Vermelho se o email for inválido
+                    ? "border-green-500 focus:border-green-500"
+                    : "border-red-500 focus:border-red-500"
                 }
                  focus:outline-none focus:scale-101 transition-all
               `}
@@ -292,8 +289,7 @@ function SignUp() {
           <div className="flex flex-col gap-3 items-center justify-center">
             <button
               type="button"
-              // Verificação para alterar os estilos com base no preenchimento de todas as informações do formulário
-              className={`w-1/3 cursor-not-allowed text-xl font-poppins font-semibold rounded-lg p-1 ${
+              className={`xl:w-1/3 cursor-not-allowed text-xl font-poppins font-semibold rounded-lg p-1 ${
                 isEmailValid && isPasswordValid && user != ""
                   ? "border-2 border-green-500  cursor-pointer"
                   : "border-2 border-red-500  cursor-not-allowed"
@@ -326,18 +322,13 @@ function SignUp() {
             >
               Continuar
             </button>
+            {/* Links para login e página principal */}
             <div className="flex flex-row gap-2">
               <Link
                 to="/login"
                 className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
               >
                 Você possui uma conta?
-              </Link>
-              <Link
-                to="/"
-                className="border-b-2 font-poppins text-sm hover:bg-gray-200 px-5 pt-1 rounded-lg transition-all"
-              >
-                Quer voltar a tela principal?
               </Link>
             </div>
           </div>
