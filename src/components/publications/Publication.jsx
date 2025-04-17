@@ -462,41 +462,42 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                 comments.map((element, index) => {
                   return (
                     <div key={index} className="p-2 rounded-sm mb-3">
-                      <div className="mb-1 flex items-center justify-between w-full">
-                        <button
-                          type="button"
+                      <div className="mb-1 flex items-start w-full">
+                        <img
+                          src={
+                            element.owner &&
+                            element.owner.image !==
+                              "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                              ? `https://byte-land-backend.onrender.com/${element.owner.image}`
+                              : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                          }
+                          alt="Foto da pessoa"
+                          className="w-10 h-10 rounded-full flex-shrink-0"
                           onClick={() =>
                             navigate(`/userPage/${element.owner?._id}`)
-                          } // Check if owner exists
-                          className="flex cursor-pointer bg-red-500 max-w-[75%]"
-                        >
-                          <img
-                            src={
-                              element.owner &&
-                              element.owner.image !==
-                                "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                ? `https://byte-land-backend.onrender.com/${element.owner.image}`
-                                : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                          }
+                          style={{ cursor: "pointer" }}
+                        />
+                        <div className="flex flex-col pl-2 flex-grow overflow-hidden">
+                          <h1
+                            className="font-poppins font-medium text-start cursor-pointer"
+                            onClick={() =>
+                              navigate(`/userPage/${element.owner?._id}`)
                             }
-                            alt="Foto da pessoa"
-                            className="w-10 h-10 rounded-full"
-                          />
-                          <div className="flex flex-col pl-2 bg-green-500 ">
-                            <h1 className="font-poppins font-medium text-start">
-                              {element.owner
-                                ? element.owner.name
-                                : "Unknown User"}
-                            </h1>
-                            <p className="text-start w-full break-words max-w-full text-sm bg-brown-500">
-                              {element.comment}
-                            </p>
-                          </div>
-                        </button>
+                          >
+                            {element.owner
+                              ? element.owner.name
+                              : "Unknown User"}
+                          </h1>
+                          <p className="text-start w-full break-words text-sm whitespace-normal">
+                            {element.comment}
+                          </p>
+                        </div>
                         {user &&
                           element.owner &&
                           user.name == element.owner.name && (
                             <button
-                              className="cursor-pointer w-10 h-full flex justify-end max-w-[25%] bg-blue-500"
+                              className="cursor-pointer flex-shrink-0 ml-auto"
                               onClick={() => deleteComment(id, element._id)}
                             >
                               <IoCloseOutline className="w-10 h-10" />
