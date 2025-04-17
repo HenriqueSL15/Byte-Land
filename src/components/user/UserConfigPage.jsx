@@ -72,7 +72,7 @@ function UserConfigPage() {
     try {
       // Envia requisição para atualizar os dados do usuário
       const response = await axios.put(
-        `http://localhost:3000/users/${user._id}`,
+        `https://byte-land-backend.onrender.com/users/${user._id}`,
         formData,
         {
           headers: {
@@ -181,7 +181,7 @@ function UserConfigPage() {
                   user &&
                   user.image !=
                     "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                    ? `http://localhost:3000/${user.image}`
+                    ? `https://byte-land-backend.onrender.com/${user.image}`
                     : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                 }
                 alt=""

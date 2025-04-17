@@ -17,7 +17,9 @@ import { useNavigate } from "react-router-dom";
 // Inverte a ordem para mostrar as mais recentes primeiro
 const fetchPublications = async () => {
   try {
-    const response = await axios.get("http://localhost:3000/publications");
+    const response = await axios.get(
+      "https://byte-land-backend.onrender.com/publications"
+    );
     const data = await response.data.reverse();
 
     return data;
@@ -30,7 +32,7 @@ const fetchPublications = async () => {
 // Recebe o ID do usuário como parâmetro e retorna as notificações em ordem inversa
 const fetchNotifications = async (userId) => {
   const { data } = await axios.get(
-    `http://localhost:3000/users/${userId}/notifications`
+    `https://byte-land-backend.onrender.com/users/${userId}/notifications`
   );
 
   return data.notifications.reverse();

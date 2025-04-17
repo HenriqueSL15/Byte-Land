@@ -102,7 +102,7 @@ function SignUp() {
   async function handleSignUpSubmit() {
     try {
       const response = await axios.post(
-        "http://localhost:3000/signup",
+        "https://byte-land-backend.onrender.com/signup",
         {
           user: user,
           email: email,

@@ -42,7 +42,7 @@ function Login() {
     try {
       // Requisição POST para o servidor
       const response = await axios.post(
-        "http://localhost:3000/login",
+        "https://byte-land-backend.onrender.com/login",
         {
           email: email,
           password: password,

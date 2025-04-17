@@ -13,7 +13,7 @@ import axios from "axios";
 const fetchRandomUsers = async (userId) => {
   try {
     const response = await axios.get(
-      `http://localhost:3000/users/${userId}/random-users`
+      `https://byte-land-backend.onrender.com/users/${userId}/random-users`
     );
 
     return response.data;

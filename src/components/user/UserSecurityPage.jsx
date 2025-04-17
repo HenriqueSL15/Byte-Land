@@ -66,7 +66,7 @@ function UserSecurityPage() {
 
     try {
       const response = await axios.put(
-        `http://localhost:3000/users/${userId}/password`,
+        `https://byte-land-backend.onrender.com/users/${userId}/password`,
         {
           newPassword: newPassword,
           oldPassword: oldPassword,

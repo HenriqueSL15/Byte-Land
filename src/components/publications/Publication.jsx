@@ -20,7 +20,7 @@ import axios from "axios";
 // Função para buscar comentários de uma publicação
 const fetchComments = async (publicationId) => {
   const { data } = await axios.get(
-    `http://localhost:3000/publications/${publicationId}/comments`
+    `https://byte-land-backend.onrender.com/publications/${publicationId}/comments`
   );
   return data.comments.reverse(); // Inverte a ordem para mostrar os mais recentes primeiro
 };
@@ -28,7 +28,7 @@ const fetchComments = async (publicationId) => {
 // Função para adicionar um comentário a uma publicação
 const addCommentMutationFn = async (commentData) => {
   const response = await axios.post(
-    `http://localhost:3000/publications/${commentData.id}/comments`,
+    `https://byte-land-backend.onrender.com/publications/${commentData.id}/comments`,
     commentData,
     {
       headers: {
@@ -44,7 +44,7 @@ const addCommentMutationFn = async (commentData) => {
 const deleteCommentMutationFn = async (data) => {
   console.log(data);
   const response = await axios.delete(
-    `http://localhost:3000/publications/${data.publicationId}/comments/${data.commentId}`
+    `https://byte-land-backend.onrender.com/publications/${data.publicationId}/comments/${data.commentId}`
   );
 
   return response.data;
@@ -54,7 +54,7 @@ const deleteCommentMutationFn = async (data) => {
 const deletePublicationMutationFn = async (data) => {
   console.log(data);
   const response = await axios.delete(
-    `http://localhost:3000/publications/${data.id}?owner=${data.owner._id}`
+    `https://byte-land-backend.onrender.com/publications/${data.id}?owner=${data.owner._id}`
   );
 
   return response.data;
@@ -65,7 +65,7 @@ const editPublicationMutationFn = async ({ publicationId, formData }) => {
   console.log(publicationId);
   console.log(formData);
   const response = await axios.put(
-    `http://localhost:3000/publications/${publicationId}`,
+    `https://byte-land-backend.onrender.com/publications/${publicationId}`,
     formData,
     {
       headers: {
@@ -191,7 +191,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     };
 
     const response = await axios.post(
-      `http://localhost:3000/users/${publicationOwner}/notifications`,
+      `https://byte-land-backend.onrender.com/users/${publicationOwner}/notifications`,
       notificationData
     );
 
@@ -337,7 +337,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                 src={
                   owner.image !=
                   "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                    ? `http://localhost:3000/${owner.image}`
+                    ? `https://byte-land-backend.onrender.com/${owner.image}`
                     : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                 }
                 alt="Foto da pessoa"
@@ -364,7 +364,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   }  `}
                   src={
                     typeof image == "string"
-                      ? "http://localhost:3000/" + image
+                      ? "https://byte-land-backend.onrender.com/" + image
                       : "No Image"
                   }
                   alt="Foto da publicação"
@@ -416,7 +416,8 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                         src={
                           user.image !=
                           "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                            ? "http://localhost:3000/" + user.image
+                            ? "https://byte-land-backend.onrender.com/" +
+                              user.image
                             : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                         }
                         alt="Foto da pessoa"
@@ -474,7 +475,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                               element.owner &&
                               element.owner.image !==
                                 "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                ? `http://localhost:3000/${element.owner.image}`
+                                ? `https://byte-land-backend.onrender.com/${element.owner.image}`
                                 : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                             }
                             alt="Foto da pessoa"
@@ -539,7 +540,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   src={
                     owner.image !=
                     "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                      ? `http://localhost:3000/${owner.image}`
+                      ? `https://byte-land-backend.onrender.com/${owner.image}`
                       : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                   }
                   alt="Foto da pessoa"
@@ -624,7 +625,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                         editedImage instanceof Blob
                           ? URL.createObjectURL(editedImage)
                           : editedImage === "EXISTING_IMAGE"
-                          ? `http://localhost:3000/${image}`
+                          ? `https://byte-land-backend.onrender.com/${image}`
                           : null
                       }
                       alt="Foto da publicação"

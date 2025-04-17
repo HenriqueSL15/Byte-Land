@@ -11,7 +11,7 @@ import { useNavigate } from "react-router-dom";
 const fetchFriendsFn = async (userId) => {
   try {
     const response = await axios.get(
-      `http://localhost:3000/users/${userId}/friends`
+      `https://byte-land-backend.onrender.com/users/${userId}/friends`
     );
     return response.data.friends;
   } catch (error) {
@@ -24,7 +24,7 @@ const fetchConversationMessages = async ({ queryKey }) => {
   const [_, userId, friendId] = queryKey;
   try {
     const response = await axios.get(
-      `http://localhost:3000/conversation/${userId}/${friendId}`
+      `https://byte-land-backend.onrender.com/conversation/${userId}/${friendId}`
     );
     return response.data;
   } catch (error) {
@@ -37,7 +37,7 @@ const fetchConversationMessages = async ({ queryKey }) => {
 const sendMessage = async (conversationId, senderId, content) => {
   try {
     const response = await axios.post(
-      `http://localhost:3000/conversations/${conversationId}/message`,
+      `https://byte-land-backend.onrender.com/conversations/${conversationId}/message`,
       { conversationId, senderId, content }
     );
     console.log(response.data);
@@ -69,7 +69,7 @@ function Messages() {
     };
 
     const response = await axios.post(
-      `http://localhost:3000/users/${userId}/notifications`,
+      `https://byte-land-backend.onrender.com/users/${userId}/notifications`,
       notificationData
     );
 
@@ -276,7 +276,7 @@ function Messages() {
                         friend.user.image ==
                         "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                           ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                          : `http://localhost:3000/${friend.user.image}`
+                          : `https://byte-land-backend.onrender.com/${friend.user.image}`
                       }
                       alt="Foto do usuário"
                     />
@@ -333,7 +333,7 @@ function Messages() {
                     selectedFriend.user.image ==
                     "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                       ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                      : `http://localhost:3000/${selectedFriend.user.image}`
+                      : `https://byte-land-backend.onrender.com/${selectedFriend.user.image}`
                   }
                   alt={`Foto de ${selectedFriend.user.name}`}
                   className="w-12 h-12 rounded-full object-cover mr-3"
