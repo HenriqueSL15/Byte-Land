@@ -487,7 +487,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                                 ? element.owner.name
                                 : "Unknown User"}
                             </h1>
-                            <p className="text-start w-full break-words">
+                            <p className="text-start w-full break-words overflow-wrap-anywhere max-w-full text-sm">
                               {element.comment}
                             </p>
                           </div>
