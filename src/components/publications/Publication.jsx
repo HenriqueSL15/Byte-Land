@@ -481,7 +481,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                             alt="Foto da pessoa"
                             className="w-10 h-10 rounded-full"
                           />
-                          <div className="flex flex-col pl-2 bg-green-500">
+                          <div className="flex flex-col pl-2 bg-green-500 max-w-[75%]">
                             <h1 className="font-poppins font-medium text-start">
                               {element.owner
                                 ? element.owner.name
@@ -496,7 +496,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                           element.owner &&
                           user.name == element.owner.name && (
                             <button
-                              className="cursor-pointer w-10 h-full flex justify-end max-w-[25%] bg-blue-500"
+                              className="cursor-pointer w-10 h-full flex justify-end  bg-blue-500"
                               onClick={() => deleteComment(id, element._id)}
                             >
                               <IoCloseOutline className="w-10 h-10" />
