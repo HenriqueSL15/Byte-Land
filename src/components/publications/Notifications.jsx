@@ -150,36 +150,40 @@ function Notifications() {
                     <motion.div
                       initial={{ opacity: 0, y: -20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.2 + index * 0.1 }}
+                      transition={{
+                        delay: 0.3 + index * 0.1,
+                      }}
                       key={index}
                       className="w-full min-h-16 flex flex-col"
                     >
                       <div className="w-full min-h-1 rounded-full bg-gray-100"></div>
                       <div className="flex bg-white my-3">
-                        {/* User avatar */}
-                        <button
-                          onClick={() =>
-                            handleNotificationClick(notification.owner._id)
-                          }
-                          className="cursor-pointer w-20 h-full hover:scale-105 transform transition-all"
-                        >
-                          <img
-                            src={
-                              notification.owner.image ==
-                              "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                : `https://byte-land-backend.onrender.com/${notification.owner.image}`
+                        {/* User avatar with fixed size */}
+                        <div className="flex-shrink-0 sm:w-10 sm:h-10 md:w-12 md:h-12 lg:w-16 lg:h-16 mr-3">
+                          <button
+                            onClick={() =>
+                              handleNotificationClick(notification.owner._id)
                             }
-                            alt="Foto do dono da notificação"
-                            className="w-16 h-16 rounded-full"
-                          />
-                        </button>
-                        {/* Notification content */}
-                        <div className="flex flex-col gap-1">
-                          <h1 className="text-start ml-4 text-lg font-semibold font-montserrat">
+                            className="cursor-pointer hover:scale-105 transform transition-all w-full h-full"
+                          >
+                            <img
+                              src={
+                                notification.owner.image ==
+                                "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                                  ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
+                                  : `https://byte-land-backend.onrender.com/${notification.owner.image}`
+                              }
+                              alt="Foto do dono da notificação"
+                              className="w-full h-full rounded-full object-cover"
+                            />
+                          </button>
+                        </div>
+                        {/* Notification content with flexible width */}
+                        <div className="flex-grow flex flex-col gap-1">
+                          <h1 className="text-start text-lg font-semibold font-montserrat">
                             {notification.owner.name}
                           </h1>
-                          <p className="text-start ml-4 text-lg">
+                          <p className="text-start text-lg">
                             {notification.message}
                           </p>
                         </div>
