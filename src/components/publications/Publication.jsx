@@ -468,7 +468,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                           onClick={() =>
                             navigate(`/userPage/${element.owner?._id}`)
                           } // Check if owner exists
-                          className="flex cursor-pointer w-full max-w-[75%]"
+                          className="flex cursor-pointer w-full bg-red-500"
                         >
                           <img
                             src={
@@ -481,13 +481,13 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                             alt="Foto da pessoa"
                             className="w-10 h-10 rounded-full"
                           />
-                          <div className="flex flex-col pl-2  ">
+                          <div className="flex flex-col pl-2 bg-green-500">
                             <h1 className="font-poppins font-medium text-start">
                               {element.owner
                                 ? element.owner.name
                                 : "Unknown User"}
                             </h1>
-                            <p className="text-start w-full break-words max-w-full text-sm">
+                            <p className="text-start w-full break-words max-w-full text-sm bg-brown-500">
                               {element.comment}
                             </p>
                           </div>
@@ -496,7 +496,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                           element.owner &&
                           user.name == element.owner.name && (
                             <button
-                              className="cursor-pointer w-10 h-full flex justify-end max-w-[25%]"
+                              className="cursor-pointer w-10 h-full flex justify-end max-w-[25%] bg-blue-500"
                               onClick={() => deleteComment(id, element._id)}
                             >
                               <IoCloseOutline className="w-10 h-10" />
