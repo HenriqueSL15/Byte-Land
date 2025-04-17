@@ -8,14 +8,27 @@ export const AuthProvider = ({ children }) => {
   // Estado para armazenar os dados do usuário autenticado
   const [user, setUser] = useState(null);
 
+  // Estado para controlar se os dados estão sendo carregados
+  const [isLoading, setIsLoading] = useState(true);
+
   // Efeito que executa uma vez ao montar o componente
   // Recupera os dados do usuário do localStorage para manter a sessão após recarregar a página
   useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    // Verifica se o valor armazenado é válido antes de fazer o parse
-    if (storedUser !== "undefined") {
-      setUser(JSON.parse(storedUser));
-    }
+    const loadUser = () => {
+      try {
+        const storedUser = localStorage.getItem("user");
+        // Verifica se o valor armazenado é válido antes de fazer o parse
+        if (storedUser && storedUser !== "undefined") {
+          setUser(JSON.parse(storedUser));
+        }
+      } catch (error) {
+        console.error("Erro ao carregar usuário:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadUser();
   }, []);
 
   // Função para autenticar o usuário
