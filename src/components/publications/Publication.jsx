@@ -128,6 +128,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     onSuccess: () => {
       // Invalida a consulta de comentários para forçar uma nova busca
       queryClient.invalidateQueries({ queryKey: ["comments", id] });
+      queryClient.invalidateQueries(["userPageData", owner._id]);
 
       // Limpa o campo de comentário
       setNewComment("");
@@ -156,6 +157,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     onSuccess: () => {
       // Invalida a consulta de comentários para forçar uma nova busca
       queryClient.invalidateQueries({ queryKey: ["comments", id] });
+      queryClient.invalidateQueries(["userPageData", owner._id]);
       toast.success("Comentário deletado com sucesso!");
     },
     onError: (error) => {
@@ -209,6 +211,8 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     onSuccess: () => {
       // Invalida a consulta de publicações para forçar uma nova busca
       queryClient.invalidateQueries({ queryKey: ["publications"] });
+      queryClient.invalidateQueries(["userPageData", owner._id]);
+
       // Sai do modo de edição
       setEdit(false);
       toast.success("Publicação editada com sucesso!");
