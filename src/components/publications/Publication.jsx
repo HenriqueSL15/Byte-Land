@@ -462,13 +462,13 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                 comments.map((element, index) => {
                   return (
                     <div key={index} className="p-2 rounded-sm mb-3">
-                      <div className="mb-1 flex items-center justify-between">
+                      <div className="mb-1 flex items-center justify-between w-full">
                         <button
                           type="button"
                           onClick={() =>
                             navigate(`/userPage/${element.owner?._id}`)
                           } // Check if owner exists
-                          className="flex cursor-pointer sm:max-w-[25%] md:max-w-[20%] xl:max-w-[55%] 2xl:max-w-[75%]"
+                          className="flex cursor-pointer w-full max-w-[75%]"
                         >
                           <img
                             src={
