@@ -14,15 +14,11 @@ function ProtectedRoute({ children }) {
     console.log(user);
   }
 
-  setTimeout(() => {
-    // Se não houver usuário e não estiver carregando, redirecione para login
-    if (!user && !isLoading) {
-      // Salva a URL atual para redirecionar de volta após o login
-      return (
-        <Navigate to="/login" state={{ from: location.pathname }} replace />
-      );
-    }
-  }, 1000);
+  // Se não houver usuário e não estiver carregando, redireciona para login
+  if (!user && !isLoading) {
+    // Salva a URL atual para redirecionar de volta após o login
+    return <Navigate to="/login" state={{ from: location.pathname }} replace />;
+  }
 
   // Se houver usuário, renderize o conteúdo da rota
   return children;
