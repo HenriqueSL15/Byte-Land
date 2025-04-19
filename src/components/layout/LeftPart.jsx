@@ -25,7 +25,7 @@ import Messages from "../../features/messages/Messages.jsx";
 // Retorna as notificações em ordem inversa (mais recentes primeiro)
 async function fetchNotifications(userId) {
   const { data } = await axios.get(
-    `https://byte-land-backend.onrender.com/users/${userId}/notifications`
+    `https://byte-land-backend.vercel.app/users/${userId}/notifications`
   );
 
   return data.notifications.reverse();
@@ -175,7 +175,7 @@ function LeftPart() {
                   src={
                     user.image !=
                     "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                      ? `https://byte-land-backend.onrender.com/${user.image}`
+                      ? `https://byte-land-backend.vercel.app/${user.image}`
                       : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                   }
                   alt="Foto da pessoa"

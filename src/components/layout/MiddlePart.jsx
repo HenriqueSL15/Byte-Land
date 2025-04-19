@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 const fetchPublications = async () => {
   try {
     const response = await axios.get(
-      "https://byte-land-backend.onrender.com/publications"
+      "https://byte-land-backend.vercel.app/publications"
     );
     const data = await response.data.reverse();
 
@@ -32,7 +32,7 @@ const fetchPublications = async () => {
 // Recebe o ID do usuário como parâmetro e retorna as notificações em ordem inversa
 const fetchNotifications = async (userId) => {
   const { data } = await axios.get(
-    `https://byte-land-backend.onrender.com/users/${userId}/notifications`
+    `https://byte-land-backend.vercel.app/users/${userId}/notifications`
   );
 
   return data.notifications.reverse();
