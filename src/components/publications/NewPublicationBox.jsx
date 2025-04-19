@@ -12,7 +12,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 // Envia os dados do formulário para a API usando multipart/form-data
 const createPublication = async (formData) => {
   const response = await axios.post(
-    "https://byte-land-backend.onrender.com/publications",
+    "https://byte-land-backend.vercel.app/publications",
     formData,
     {
       headers: {
@@ -117,7 +117,7 @@ function NewPublicationBox() {
             src={
               user.image !=
               "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                ? `https://byte-land-backend.onrender.com/${user.image}`
+                ? user.image
                 : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
             }
             alt="Foto da pessoa"

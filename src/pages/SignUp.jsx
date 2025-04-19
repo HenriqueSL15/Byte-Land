@@ -102,7 +102,7 @@ function SignUp() {
   async function handleSignUpSubmit() {
     try {
       const response = await axios.post(
-        "https://byte-land-backend.onrender.com/signup",
+        "https://byte-land-backend.vercel.app/signup",
         {
           user: user,
           email: email,

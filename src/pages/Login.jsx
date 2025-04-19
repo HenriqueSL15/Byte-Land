@@ -42,7 +42,7 @@ function Login() {
     try {
       // Requisição POST para o servidor
       const response = await axios.post(
-        "https://byte-land-backend.onrender.com/login",
+        "https://byte-land-backend.vercel.app/login",
         {
           email: email,
           password: password,

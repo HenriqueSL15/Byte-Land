@@ -12,7 +12,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 const fetchNotifications = async (userId) => {
   const { data } = await axios.get(
-    `https://byte-land-backend.onrender.com/users/${userId}/notifications`
+    `https://byte-land-backend.vercel.app/users/${userId}/notifications`
   );
 
   return data.notifications.reverse();
@@ -49,7 +49,7 @@ function Notifications() {
     try {
       console.log("Fazendo mutação");
       const response = await axios.patch(
-        `https://byte-land-backend.onrender.com/users/${user._id}/notifications/mark-as-read`
+        `https://byte-land-backend.vercel.app/users/${user._id}/notifications/mark-as-read`
       );
 
       return response.data;
@@ -171,7 +171,7 @@ function Notifications() {
                                 notification.owner.image ==
                                 "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                                   ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                  : `https://byte-land-backend.onrender.com/${notification.owner.image}`
+                                  : `https://byte-land-backend.vercel.app/${notification.owner.image}`
                               }
                               alt="Foto do dono da notificação"
                               className="w-full h-full rounded-full object-cover"
@@ -236,7 +236,7 @@ function Notifications() {
                                 notification.owner.image ==
                                 "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                                   ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                  : `https://byte-land-backend.onrender.com/${notification.owner.image}`
+                                  : `https://byte-land-backend.vercel.app/${notification.owner.image}`
                               }
                               alt="Foto do dono da notificação"
                               className="w-full h-full rounded-full object-cover"

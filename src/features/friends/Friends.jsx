@@ -14,7 +14,7 @@ import { motion, AnimatePresence } from "framer-motion";
 const fetchFriendsFn = async (userId) => {
   try {
     const response = await axios.get(
-      `https://byte-land-backend.onrender.com/users/${userId}/friends`
+      `https://byte-land-backend.vercel.app/users/${userId}/friends`
     );
 
     return response.data.friends;
@@ -39,7 +39,7 @@ function Friends() {
     };
 
     const response = await axios.post(
-      `https://byte-land-backend.onrender.com/users/${userId}/notifications`,
+      `https://byte-land-backend.vercel.app/users/${userId}/notifications`,
       notificationData
     );
 
@@ -105,7 +105,7 @@ function Friends() {
 
       // Envia a atualização para a API
       const response = await axios.patch(
-        `https://byte-land-backend.onrender.com/users/${userId}/friends/${friendId}`,
+        `https://byte-land-backend.vercel.app/users/${userId}/friends/${friendId}`,
         {
           status: status,
         }
@@ -216,7 +216,7 @@ function Friends() {
                             friend.user.image ==
                             "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                               ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                              : `https://byte-land-backend.onrender.com/${friend.user.image}`
+                              : `https://byte-land-backend.vercel.app/${friend.user.image}`
                           }
                           alt="Foto do dono da notificação"
                           className="w-15 h-15 rounded-full"
@@ -304,7 +304,7 @@ function Friends() {
                               friend.user.image ==
                               "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                                 ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                : `https://byte-land-backend.onrender.com/${friend.user.image}`
+                                : `https://byte-land-backend.vercel.app/${friend.user.image}`
                             }
                             alt="Foto do dono da notificação"
                             className="w-full h-full rounded-full"

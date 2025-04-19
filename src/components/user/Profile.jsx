@@ -11,7 +11,7 @@ function Profile({ img, name, onClick }) {
         // Verifica se deve usar a imagem do usuário ou a imagem padrão
         src={
           img != "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-            ? `https://byte-land-backend.onrender.com/${img}`
+            ? `https://byte-land-backend.vercel.app/${img}`
             : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
         }
         alt="Foto"

@@ -21,7 +21,7 @@ import LoadingScreen from "../components/common/LoadingScreen.jsx";
 const fetchFriendsFn = async (userId) => {
   try {
     const response = await axios.get(
-      `https://byte-land-backend.onrender.com/users/${userId}/friends`
+      `https://byte-land-backend.vercel.app/users/${userId}/friends`
     );
 
     return response.data.friends;
@@ -33,7 +33,7 @@ const fetchFriendsFn = async (userId) => {
 // Função para buscar dados do usuário
 async function getUserDataFn(userId) {
   const response = await axios.get(
-    `https://byte-land-backend.onrender.com/users/${userId}/publications`
+    `https://byte-land-backend.vercel.app/users/${userId}/publications`
   );
 
   return response.data;
@@ -42,7 +42,7 @@ async function getUserDataFn(userId) {
 // Função para atualizar dados do usuário
 async function updateUserDataMutationFn({ userId, formData }) {
   const response = await axios.put(
-    `https://byte-land-backend.onrender.com/users/${userId}/userPage`,
+    `https://byte-land-backend.vercel.app/users/${userId}/userPage`,
     formData,
     {
       headers: {
@@ -122,7 +122,7 @@ function UserPage() {
     };
 
     const response = await axios.post(
-      `https://byte-land-backend.onrender.com/users/${userId}/notifications`,
+      `https://byte-land-backend.vercel.app/users/${userId}/notifications`,
       notificationData
     );
 
@@ -163,7 +163,7 @@ function UserPage() {
   const handleSendFriendRequest = async (userId, friendId) => {
     try {
       const response = await axios.post(
-        `https://byte-land-backend.onrender.com/users/${userId}/friends/${friendId}`
+        `https://byte-land-backend.vercel.app/users/${userId}/friends/${friendId}`
       );
       toast.success("Solicitação enviada com sucesso!");
       addNotificationToOwner(
@@ -183,7 +183,7 @@ function UserPage() {
   const handleRemoveFriend = async (userId, friendId) => {
     try {
       const response = await axios.delete(
-        `https://byte-land-backend.onrender.com/users/${userId}/friends/${friendId}`
+        `https://byte-land-backend.vercel.app/users/${userId}/friends/${friendId}`
       );
       toast.success("Amizade desfeita com sucesso!");
       addNotificationToOwner(friendId, userId, "Desfez sua amizade");
@@ -248,7 +248,7 @@ function UserPage() {
                 src={
                   userData.user.image !=
                   "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                    ? `https://byte-land-backend.onrender.com/${userData.user.image}`
+                    ? `https://byte-land-backend.vercel.app/${userData.user.image}`
                     : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
                 }
                 className="h-full w-full object-cover"
@@ -259,7 +259,7 @@ function UserPage() {
               src={
                 userData.user.userPageImage !=
                 "https://www.solidbackgrounds.com/images/1920x1080/1920x1080-black-solid-color-background.jpg"
-                  ? `https://byte-land-backend.onrender.com/${userData.user.userPageImage}`
+                  ? `https://byte-land-backend.vercel.app/${userData.user.userPageImage}`
                   : "https://www.solidbackgrounds.com/images/1920x1080/1920x1080-black-solid-color-background.jpg"
               }
               alt="Imagem do Perfil do Usuário"

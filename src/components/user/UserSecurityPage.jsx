@@ -66,7 +66,7 @@ function UserSecurityPage() {
 
     try {
       const response = await axios.put(
-        `https://byte-land-backend.onrender.com/users/${userId}/password`,
+        `https://byte-land-backend.vercel.app/users/${userId}/password`,
         {
           newPassword: newPassword,
           oldPassword: oldPassword,
