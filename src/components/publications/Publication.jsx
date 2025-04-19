@@ -338,12 +338,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
               className="m-5 mb-10 flex cursor-pointer gap-2"
             >
               <img
-                src={
-                  owner.image !=
-                  "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                    ? `https://byte-land-backend.vercel.app/${owner.image}`
-                    : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                }
+                src={owner?.image}
                 alt="Foto da pessoa"
                 className={`w-12 h-12 rounded-full`}
               />
