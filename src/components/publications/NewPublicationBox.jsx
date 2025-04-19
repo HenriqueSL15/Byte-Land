@@ -114,12 +114,7 @@ function NewPublicationBox() {
         {/* Cabeçalho com informações do usuário */}
         <div className="m-5 mb-5 flex items-center gap-2">
           <img
-            src={
-              user.image !=
-              "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                ? user.image
-                : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-            }
+            src={user?.image}
             alt="Foto da pessoa"
             className="w-12 h-12 rounded-full"
           />

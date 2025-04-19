@@ -9,11 +9,7 @@ function Profile({ img, name, onClick }) {
         whileTap={{ scale: 0.95 }}
         onClick={onClick}
         // Verifica se deve usar a imagem do usuário ou a imagem padrão
-        src={
-          img != "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-            ? `https://byte-land-backend.vercel.app/${img}`
-            : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-        }
+        src={img}
         alt="Foto"
         className="sm:w-6 sm:h-6 md:w-8 md:h-8 lg:w-11 lg:h-11 xl:w-12 xl:h-12 rounded-full"
       />

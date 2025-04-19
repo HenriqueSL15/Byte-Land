@@ -177,13 +177,7 @@ function UserConfigPage() {
             <h2 className="md:text-xl lg:text-3xl text-gray-800 mb-2 font-semibold flex gap-3">
               Foto de Perfil
               <img
-                src={
-                  user &&
-                  user.image !=
-                    "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                    ? `https://byte-land-backend.vercel.app/${user.image}`
-                    : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                }
+                src={user && user.image}
                 alt=""
                 className="w-10 h-10 rounded-full"
               />

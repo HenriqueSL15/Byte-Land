@@ -361,17 +361,12 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
               <h2 className="text-base text-gray-800 font-funnel-sans">
                 {description}
               </h2>
-              {console.log(image)}
               <div className="flex justify-start">
                 <img
                   className={`max-h-2/4 my-5 rounded-lg ${
                     image == null && "hidden"
                   }  `}
-                  src={
-                    typeof image == "string"
-                      ? "https://byte-land-backend.vercel.app/" + image
-                      : "No Image"
-                  }
+                  src={image}
                   alt="Foto da publicação"
                 />
               </div>
@@ -418,13 +413,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                   <div>
                     <div className="mb-3 flex items-center gap-2">
                       <img
-                        src={
-                          user.image !=
-                          "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                            ? "https://byte-land-backend.vercel.app/" +
-                              user.image
-                            : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                        }
+                        src={user.image}
                         alt="Foto da pessoa"
                         className="w-10 h-10 rounded-full"
                       />
@@ -469,13 +458,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                     <div key={index} className="p-2 rounded-sm mb-3">
                       <div className="mb-1 flex items-start w-full">
                         <img
-                          src={
-                            element.owner &&
-                            element.owner.image !==
-                              "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                              ? `https://byte-land-backend.vercel.app/${element.owner.image}`
-                              : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                          }
+                          src={element.owner?.image}
                           alt="Foto da pessoa"
                           className="w-10 h-10 rounded-full flex-shrink-0"
                           onClick={() =>
@@ -543,12 +526,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
               {/* Conteúdo do formulário de edição */}
               <div className="m-5 mb-10 flex items-center gap-2">
                 <img
-                  src={
-                    owner.image !=
-                    "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                      ? `https://byte-land-backend.vercel.app/${owner.image}`
-                      : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                  }
+                  src={owner?.image}
                   alt="Foto da pessoa"
                   className="w-12 h-12 rounded-full"
                 />
@@ -631,7 +609,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
                         editedImage instanceof Blob
                           ? URL.createObjectURL(editedImage)
                           : editedImage === "EXISTING_IMAGE"
-                          ? `https://byte-land-backend.vercel.app/${image}`
+                          ? image
                           : null
                       }
                       alt="Foto da publicação"

@@ -245,23 +245,13 @@ function UserPage() {
                 initial={{ scale: 1 }}
                 whileHover={{ scale: 1.15 }}
                 transition={{ duration: 0.2, ease: "easeInOut" }}
-                src={
-                  userData.user.image !=
-                  "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                    ? `https://byte-land-backend.vercel.app/${userData.user.image}`
-                    : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                }
+                src={userData.user?.image}
                 className="h-full w-full object-cover"
                 alt="Imagem do Usuário"
               />
             </div>
             <img
-              src={
-                userData.user.userPageImage !=
-                "https://www.solidbackgrounds.com/images/1920x1080/1920x1080-black-solid-color-background.jpg"
-                  ? `https://byte-land-backend.vercel.app/${userData.user.userPageImage}`
-                  : "https://www.solidbackgrounds.com/images/1920x1080/1920x1080-black-solid-color-background.jpg"
-              }
+              src={userData.user?.userPageImage}
               alt="Imagem do Perfil do Usuário"
               className="rounded-lg w-full h-72 z-40"
             />

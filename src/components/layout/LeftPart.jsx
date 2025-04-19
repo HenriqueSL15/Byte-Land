@@ -172,12 +172,7 @@ function LeftPart() {
               <div className="flex flex-row gap-3 mb-5">
                 {/* Exibe a imagem do usuário ou uma imagem padrão */}
                 <img
-                  src={
-                    user.image !=
-                    "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                      ? `https://byte-land-backend.vercel.app/${user.image}`
-                      : "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                  }
+                  src={user?.image}
                   alt="Foto da pessoa"
                   className="w-12 h-12 rounded-full"
                 />

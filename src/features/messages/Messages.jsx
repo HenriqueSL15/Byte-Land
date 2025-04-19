@@ -272,12 +272,7 @@ function Messages() {
                         navigate(`/userPage/${friend.user._id}`);
                       }}
                       className="cursor-pointer sm:w-10 sm:h-10 lg:w-14 lg:h-14 rounded-full object-cover"
-                      src={
-                        friend.user.image ==
-                        "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                          ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                          : `https://byte-land-backend.vercel.app/${friend.user.image}`
-                      }
+                      src={friend.user?.image}
                       alt="Foto do usuário"
                     />
 
@@ -329,12 +324,7 @@ function Messages() {
                   <IoArrowBackOutline className="w-6 h-6 cursor-pointer" />
                 </motion.button>
                 <img
-                  src={
-                    selectedFriend.user.image ==
-                    "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                      ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                      : `https://byte-land-backend.vercel.app/${selectedFriend.user.image}`
-                  }
+                  src={selectedFriend.user?.image}
                   alt={`Foto de ${selectedFriend.user.name}`}
                   className="w-12 h-12 rounded-full object-cover mr-3"
                 />

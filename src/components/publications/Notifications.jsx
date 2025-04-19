@@ -167,12 +167,7 @@ function Notifications() {
                             className="cursor-pointer hover:scale-105 transform transition-all w-full h-full"
                           >
                             <img
-                              src={
-                                notification.owner.image ==
-                                "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                  ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                  : `https://byte-land-backend.vercel.app/${notification.owner.image}`
-                              }
+                              src={notification.owner?.image}
                               alt="Foto do dono da notificação"
                               className="w-full h-full rounded-full object-cover"
                             />
@@ -232,12 +227,7 @@ function Notifications() {
                             className="cursor-pointer hover:scale-105 transform transition-all w-full h-full"
                           >
                             <img
-                              src={
-                                notification.owner.image ==
-                                "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                  ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                  : `https://byte-land-backend.vercel.app/${notification.owner.image}`
-                              }
+                              src={notification.owner.image}
                               alt="Foto do dono da notificação"
                               className="w-full h-full rounded-full object-cover"
                             />
