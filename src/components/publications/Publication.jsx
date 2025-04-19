@@ -361,6 +361,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
               <h2 className="text-base text-gray-800 font-funnel-sans">
                 {description}
               </h2>
+              {console.log(image)}
               <div className="flex justify-start">
                 <img
                   className={`max-h-2/4 my-5 rounded-lg ${
