@@ -212,12 +212,7 @@ function Friends() {
                     <div className="flex bg-white my-3 relative">
                       <button className="cursor-pointer w-20 h-full hover:scale-105 transform transition-all">
                         <img
-                          src={
-                            friend.user.image ==
-                            "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                              ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                              : `https://byte-land-backend.vercel.app/${friend.user.image}`
-                          }
+                          src={friend.user?.image}
                           alt="Foto do dono da notificação"
                           className="w-15 h-15 rounded-full"
                         />
@@ -300,12 +295,7 @@ function Friends() {
                       <div className="flex gap-2 ml-[5%]">
                         <button className="cursor-pointer sm:w-8 md:w-12 lg:w-15 h-full hover:scale-103 transform transition-all overflow-visible relative z-10">
                           <img
-                            src={
-                              friend.user.image ==
-                              "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                ? "https://cdn-icons-png.flaticon.com/512/711/711769.png"
-                                : `https://byte-land-backend.vercel.app/${friend.user.image}`
-                            }
+                            src={friend.user?.image}
                             alt="Foto do dono da notificação"
                             className="w-full h-full rounded-full"
                             onClick={() => {
