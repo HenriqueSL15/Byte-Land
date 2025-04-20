@@ -1,7 +1,5 @@
 # Byte Land - Uma Rede Social Interativa
 
-## OBS: CASO AO ABRIR O PROJETO, IMAGENS/INTERAÇÕES COMO LOGIN/SIGNUP NÃO ESTEJAM FUNCIONANDO, É PORQUE O SERVIDOR DEMORA EM MÉDIA 1 MIN PARA REATIVAR APÓS A INATIVIDADE
-
 Este projeto foi desenvolvido para criar uma plataforma de rede social onde os usuários podem compartilhar publicações, interagir através de comentários e gerenciar seus perfis pessoais, proporcionando uma experiência completa de mídia social.
 
 ## 📸 Demonstração
