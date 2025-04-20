@@ -10,8 +10,6 @@ function ProtectedRoute({ children }) {
   // Se ainda estiver carregando, não faça nada (opcional: mostrar um spinner)
   if (isLoading) {
     <LoadingScreen />;
-  } else {
-    console.log(user);
   }
 
   // Se não houver usuário e não estiver carregando, redireciona para login

@@ -79,7 +79,6 @@ function UserSecurityPage() {
       );
 
       if (response.status == 200) {
-        console.log("Senha alterada com sucesso!", response.data);
         toast.success("Senha alterada com sucesso!");
         setOldPassword("");
         setNewPassword("");

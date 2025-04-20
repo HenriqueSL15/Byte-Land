@@ -57,7 +57,7 @@ function Login() {
       // Se a resposta for bem-sucedida
       if (response.status == 200) {
         login(response.data.user);
-        console.log("Login realizado com sucesso!");
+
         toast.success("Login realizado com sucesso!");
         navigate("/");
       }
@@ -65,7 +65,6 @@ function Login() {
       console.log(error);
       toast.error("Email ou senha incorretos!");
     }
-    console.log(`Email: ${email}\nSenha: ${password}`);
   }
 
   return (

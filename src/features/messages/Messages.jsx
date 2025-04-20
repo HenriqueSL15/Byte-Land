@@ -40,7 +40,7 @@ const sendMessage = async (conversationId, senderId, content) => {
       `https://byte-land-backend.vercel.app/conversations/${conversationId}/message`,
       { conversationId, senderId, content }
     );
-    console.log(response.data);
+
     return response.data;
   } catch (error) {
     console.error(error);
@@ -103,12 +103,10 @@ function Messages() {
   useEffect(() => {
     if (conversationData) {
       if (conversationData.messages) {
-        console.log("Atualizando mensagens:", conversationData.messages);
         setMessages(conversationData.messages);
       }
 
       if (conversationData.conversation) {
-        console.log("Atualizando conversa:", conversationData.conversation);
         setCurrentConversation(conversationData.conversation);
       }
     }

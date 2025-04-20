@@ -76,7 +76,6 @@ function SignUp() {
       setErrors([]);
       setIsInitial(true);
     }
-    console.log(errors);
   }, [password1]);
 
   // Função para verificar se uma regra específica está nos erros
@@ -115,7 +114,6 @@ function SignUp() {
         }
       );
 
-      console.log("Valor da response:", response.data.message);
       if (
         response.status == 200 &&
         response.data.message == "Usuário criado com sucesso!"
@@ -129,7 +127,6 @@ function SignUp() {
       console.log(error);
       toast.error("Erro ao cadastrar usuário!");
     }
-    console.log(`Usuário: ${user}\nEmail: ${email}\nSenha: ${password1}`);
   }
 
   return (

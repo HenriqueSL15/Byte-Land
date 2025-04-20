@@ -113,14 +113,14 @@ function Friends() {
 
       // Adiciona notificação e exibe toast baseado na ação
       if (status === "accepted") {
-        addNotificationToOwner(friendId, userId, "Negou seu pedido de amizade");
-        toast.success("Pedido de amizade aceito!");
-      } else if (status === "rejected") {
         addNotificationToOwner(
           friendId,
           userId,
           "Aceitou seu pedido de amizade"
         );
+        toast.success("Pedido de amizade aceito!");
+      } else if (status === "rejected") {
+        addNotificationToOwner(friendId, userId, "Negou seu pedido de amizade");
         toast.success("Pedido de amizade negado!");
       }
 

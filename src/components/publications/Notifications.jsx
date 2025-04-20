@@ -47,7 +47,6 @@ function Notifications() {
    */
   async function markAsReadMutationFn() {
     try {
-      console.log("Fazendo mutação");
       const response = await axios.patch(
         `https://byte-land-backend.vercel.app/users/${user._id}/notifications/mark-as-read`
       );

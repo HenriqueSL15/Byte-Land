@@ -42,7 +42,6 @@ const addCommentMutationFn = async (commentData) => {
 
 // Função para deletar um comentário
 const deleteCommentMutationFn = async (data) => {
-  console.log(data);
   const response = await axios.delete(
     `https://byte-land-backend.vercel.app/publications/${data.publicationId}/comments/${data.commentId}`
   );
@@ -52,7 +51,6 @@ const deleteCommentMutationFn = async (data) => {
 
 // Função para deletar uma publicação
 const deletePublicationMutationFn = async (data) => {
-  console.log(data);
   const response = await axios.delete(
     `https://byte-land-backend.vercel.app/publications/${data.id}?owner=${data.owner._id}`
   );
@@ -62,8 +60,6 @@ const deletePublicationMutationFn = async (data) => {
 
 // Função para editar uma publicação
 const editPublicationMutationFn = async ({ publicationId, formData }) => {
-  console.log(publicationId);
-  console.log(formData);
   const response = await axios.put(
     `https://byte-land-backend.vercel.app/publications/${publicationId}`,
     formData,
