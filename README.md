@@ -5,6 +5,17 @@ Este projeto foi desenvolvido para criar uma plataforma de rede social onde os u
 ## 📸 Demonstração
 Acesse uma demonstração ao vivo [aqui](https://byte-land.netlify.app/)
 
+### Como criar uma conta/logar em uma conta.
+![opera_pZkwLfwXuW](https://github.com/user-attachments/assets/da9b44c8-f5d5-413d-85e5-3a897474b5da)
+
+### Como criar uma publicação.
+![opera_CUflm6UeZu](https://github.com/user-attachments/assets/8cbe9ed0-261e-4449-b7e3-c3fcd9c7bce6)
+
+### Como editar/deletar uma publicação (só funciona se você for o dono da publicação)
+![opera_hvMVN5gbqa](https://github.com/user-attachments/assets/5ff512aa-937a-44c6-94fa-c5c394d39188)
+
+
+
 ## 🚀 Tecnologias Utilizadas
 ### Frontend
 - **React com JSX**: Para o desenvolvimento do frontend interativo e responsivo.
