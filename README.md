@@ -11,9 +11,30 @@ Acesse uma demonstração ao vivo [aqui](https://byte-land.netlify.app/)
 ### Como criar uma publicação.
 ![opera_CUflm6UeZu](https://github.com/user-attachments/assets/8cbe9ed0-261e-4449-b7e3-c3fcd9c7bce6)
 
-### Como editar/deletar uma publicação (só funciona se você for o dono da publicação)
+### Como editar/deletar uma publicação. (só funciona se você for o dono da publicação)
 ![opera_hvMVN5gbqa](https://github.com/user-attachments/assets/5ff512aa-937a-44c6-94fa-c5c394d39188)
 
+### Como alterar as informações da sua conta
+![opera_Jp6abA2IHe](https://github.com/user-attachments/assets/e8c63a3b-b00f-449b-a2c1-8e0d3134db5b)
+
+### Como mandar/aceitar pedidos de amizade.
+
+- Pessoa 1
+ ![opera_ITiVCFZ7c2](https://github.com/user-attachments/assets/03fd8199-d70f-4756-a0ef-abb1bddb6a71)
+ 
+- Pessoa 2
+![chrome_iUuqOb2Iwk](https://github.com/user-attachments/assets/7e98a5b3-3ecf-4b62-ac55-e6be2b4b7d1a)
+
+### Como mandar mensagens.
+
+- Pessoa 1
+![opera_WiLWEEjtTi](https://github.com/user-attachments/assets/57687b47-6316-43ef-9a65-dc322766286d)
+
+- Pessoa 2
+![chrome_vZSYrqylj6](https://github.com/user-attachments/assets/8669b842-10a5-47be-b8bf-5ccea1b11f7a)
+
+### Como acessar a sua página (ou a de outras pessoas) e editar as informações na mesma (somente se for a sua página)
+![opera_AlsAuSk83L](https://github.com/user-attachments/assets/becf2a92-610d-4843-b1a3-fd9c7c4985f6)
 
 
 ## 🚀 Tecnologias Utilizadas
