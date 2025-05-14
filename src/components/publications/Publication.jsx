@@ -260,7 +260,7 @@ function Publication({ id, isOwner, owner, date, title, description, image }) {
     if (editedImage instanceof Blob) {
       formData.append("image", editedImage);
     } else if (editedImage === null) {
-      formData.append("image", null);
+      formData.append("removeImage", "true");
     }
 
     // Executa a mutação de edição
